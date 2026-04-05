@@ -243,19 +243,22 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
               {/* Moves Section */}
               <div className="space-y-3">
                 <p className="text-[#1E3A5F]/40 text-[10px] font-black tracking-[0.3em] uppercase">Signature Moves</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {activePokemon.moves.slice(0, 6).map(({ move }) => (
-                    <div 
-                      key={move.name}
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#1E3A5F]/10 border border-[#1E3A5F]/20 group hover:bg-[#1E3A5F] transition-all"
-                    >
-                      <Zap size={14} className="text-[#1E3A5F] group-hover:text-white" />
-                      <span className="text-[10px] font-black text-[#1E3A5F] uppercase tracking-wider group-hover:text-white">
-                        {capitalize(move.name)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {activePokemon.moves
+                      .filter(m => m.version_group_details.some(v => v.move_learn_method.name === 'level-up'))
+                      .slice(0, 12)
+                      .map(({ move }) => (
+                        <div 
+                          key={move.name}
+                          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[#1E3A5F]/10 border border-[#1E3A5F]/20 group hover:bg-[#1E3A5F] hover:shadow-md transition-all cursor-default"
+                        >
+                          <Zap size={14} className="text-[#1E3A5F] group-hover:text-white" />
+                          <span className="text-[10px] font-black text-[#1E3A5F] uppercase tracking-wider group-hover:text-white truncate">
+                            {capitalize(move.name)}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
               </div>
             </div>
 

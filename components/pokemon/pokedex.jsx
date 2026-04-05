@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
-import { 
-  fetchPokemon, 
+import {
+  fetchPokemon,
   fetchPokemonList,
   capitalize,
   typeColors,
@@ -86,7 +86,7 @@ export const Pokedex = memo(function Pokedex() {
           id: extractIdFromUrl(p.url)
         }));
         setAllPokemonBasic(basicList);
-        
+
         // Load first batch of full Pokemon data
         await loadPokemonBatch(basicList.slice(0, INITIAL_LOAD));
       } catch (error) {
@@ -102,7 +102,7 @@ export const Pokedex = memo(function Pokedex() {
   // Efficient batch loading with caching
   const loadPokemonBatch = useCallback(async (batch) => {
     const toLoad = batch.filter(p => !pokemonCache.has(p.id));
-    
+
     if (toLoad.length === 0) {
       const cached = batch.map(p => pokemonCache.get(p.id)).filter(Boolean);
       setLoadedPokemon(prev => {
@@ -155,7 +155,7 @@ export const Pokedex = memo(function Pokedex() {
 
   const loadMorePokemon = useCallback(async () => {
     if (loadingMore) return;
-    
+
     setLoadingMore(true);
     const nextBatch = allPokemonBasic.slice(visibleCount, visibleCount + BATCH_SIZE);
     await loadPokemonBatch(nextBatch);
@@ -166,15 +166,15 @@ export const Pokedex = memo(function Pokedex() {
   // Load Pokemon for selected generation
   const handleGenerationChange = useCallback(async (gen) => {
     setSelectedGen(gen);
-    
+
     if (gen === 0) return; // "All" doesn't need special loading
-    
+
     const genData = generations.find(g => g.gen === gen);
     if (!genData) return;
-    
+
     // Check if we have Pokemon for this generation loaded
     const genPokemon = loadedPokemon.filter(p => p.id >= genData.start && p.id <= genData.end);
-    
+
     // If we don't have enough, load them
     if (genPokemon.length < (genData.end - genData.start + 1)) {
       setLoadingMore(true);
@@ -198,7 +198,7 @@ export const Pokedex = memo(function Pokedex() {
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase().replace('#', '');
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         p.name.toLowerCase().includes(query) ||
         p.id.toString() === query ||
         p.id.toString().padStart(3, '0') === query ||
@@ -222,7 +222,7 @@ export const Pokedex = memo(function Pokedex() {
   // Handle search
   const handleSearch = useCallback((query) => {
     setSearchQuery(query);
-    
+
     // If searching for a specific ID, try to load it
     const id = parseInt(query.replace('#', ''));
     if (!isNaN(id) && id > 0 && id <= TOTAL_POKEMON && !pokemonCache.has(id)) {
@@ -232,7 +232,7 @@ export const Pokedex = memo(function Pokedex() {
           if (prev.find(p => p.id === id)) return prev;
           return [...prev, pokemon].sort((a, b) => a.id - b.id);
         });
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }, []);
 
@@ -271,8 +271,8 @@ export const Pokedex = memo(function Pokedex() {
         <div className="mb-10 p-1 bg-white/10 backdrop-blur-md rounded-[2rem] border border-white/20 shadow-2xl">
           <div className="p-6 md:p-8 space-y-6">
             {/* Search Bar */}
-            <SearchBar 
-              onSearch={handleSearch} 
+            <SearchBar
+              onSearch={handleSearch}
               isLoading={loading}
             />
 
@@ -287,13 +287,12 @@ export const Pokedex = memo(function Pokedex() {
                       key={g.gen}
                       onClick={() => handleGenerationChange(g.gen)}
                       disabled={loadingMore}
-                      className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 disabled:opacity-50 ring-1 ${
-                        selectedGen === g.gen 
-                          ? 'bg-[#FACC15] text-[#1E3A5F] scale-110 shadow-lg ring-[#FACC15]' 
-                          : 'bg-white/5 text-white hover:bg-white/15 ring-white/10'
-                      }`}
+                      className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 disabled:opacity-50 ring-2 ${selectedGen === g.gen
+                          ? 'bg-[#FACC15] text-[#1E3A5F] scale-110 shadow-xl ring-[#FACC15] z-10'
+                          : 'bg-white/15 text-white hover:bg-white/25 ring-white/20 hover:scale-105'
+                        }`}
                     >
-                      {g.name}
+                      {g.name.toUpperCase()}
                     </button>
                   ))}
                 </div>
@@ -303,25 +302,23 @@ export const Pokedex = memo(function Pokedex() {
               <div className="flex justify-center gap-4">
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-2xl transition-all font-bold text-sm ring-1 ${
-                    showFilters ? 'bg-white text-[#1E3A5F] ring-white' : 'bg-white/5 text-white hover:bg-white/10 ring-white/20'
-                  }`}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-2xl transition-all font-bold text-sm border-2 ${showFilters ? 'bg-white text-[#1E3A5F] border-white shadow-xl scale-105' : 'bg-white/15 text-white hover:bg-white/25 border-white/20 hover:scale-105'
+                    }`}
                 >
                   <Filter size={18} />
-                  <span>Filter by Type</span>
-                  <ChevronDown 
-                    size={18} 
+                  <span>FILTER BY TYPE</span>
+                  <ChevronDown
+                    size={18}
                     className={`transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`}
                   />
                 </button>
                 <button
                   onClick={() => setShowLegendariesOnly(!showLegendariesOnly)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-2xl transition-all font-bold text-sm ring-1 ${
-                    showLegendariesOnly ? 'bg-[#FACC15] text-[#1E3A5F] ring-[#FACC15] shadow-lg' : 'bg-white/5 text-white hover:bg-white/10 ring-white/20'
-                  }`}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-2xl transition-all font-bold text-sm border-2 ${showLegendariesOnly ? 'bg-[#FACC15] text-[#1E3A5F] border-[#FACC15] shadow-xl scale-105' : 'bg-white/15 text-white hover:bg-white/25 border-white/20 hover:scale-105'
+                    }`}
                 >
                   <Crown size={18} />
-                  <span>Legendaries</span>
+                  <span>LEGENDARIES</span>
                 </button>
               </div>
 
@@ -329,24 +326,22 @@ export const Pokedex = memo(function Pokedex() {
                 <div className="pt-4 border-t border-white/5 flex flex-wrap justify-center gap-2 animate-slide-up">
                   <button
                     onClick={() => setSelectedType('')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                      !selectedType 
-                        ? 'bg-white text-[#1E3A5F] scale-105' 
-                        : 'bg-white/10 text-white hover:bg-white/20'
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${!selectedType
+                        ? 'bg-white text-[#1E3A5F] border-white scale-105 shadow-md'
+                        : 'bg-white/20 text-white border-white/10 hover:bg-white/30'
+                      }`}
                   >
-                    All Types
+                    ALL TYPES
                   </button>
                   {POKEMON_TYPES.map(type => (
                     <button
                       key={type}
                       onClick={() => setSelectedType(type === selectedType ? '' : type)}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all text-white shadow-sm ${
-                        selectedType === type ? 'ring-2 ring-white scale-110 z-10' : 'opacity-80 hover:opacity-100 hover:scale-105'
-                      }`}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all text-white shadow-md border-2 ${selectedType === type ? 'ring-4 ring-white border-white scale-110 z-10' : 'opacity-90 hover:opacity-100 hover:scale-105 border-transparent'
+                        }`}
                       style={{ backgroundColor: typeColors[type] }}
                     >
-                      {capitalize(type)}
+                      {capitalize(type).toUpperCase()}
                     </button>
                   ))}
                 </div>
@@ -362,7 +357,7 @@ export const Pokedex = memo(function Pokedex() {
               <span className="animate-pulse">Accessing {generations.find(g => g.gen === selectedGen)?.name} data...</span>
             ) : (
               <span className="px-4 py-1.5 bg-black/20 rounded-full">
-                {filteredList.length} Units Found {selectedType && `• ${capitalize(selectedType)}`} {selectedGen > 0 && `• ${generations.find(g => g.gen === selectedGen)?.name}`}
+                {filteredList.length} UNITS FOUND {selectedType && `• ${capitalize(selectedType).toUpperCase()}`} {selectedGen > 0 && `• ${generations.find(g => g.gen === selectedGen)?.name.toUpperCase()}`}
               </span>
             )}
           </p>
@@ -375,9 +370,9 @@ export const Pokedex = memo(function Pokedex() {
           <div className="text-center py-16">
             <div className="w-20 h-20 mx-auto mb-4 opacity-40">
               <svg viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" fill="none" stroke="white" strokeWidth="2"/>
-                <line x1="32" y1="32" x2="68" y2="68" stroke="white" strokeWidth="2"/>
-                <line x1="68" y1="32" x2="32" y2="68" stroke="white" strokeWidth="2"/>
+                <circle cx="50" cy="50" r="45" fill="none" stroke="white" strokeWidth="2" />
+                <line x1="32" y1="32" x2="68" y2="68" stroke="white" strokeWidth="2" />
+                <line x1="68" y1="32" x2="32" y2="68" stroke="white" strokeWidth="2" />
               </svg>
             </div>
             <h3 className="text-white text-lg font-bold mb-1">No Pokemon Found</h3>

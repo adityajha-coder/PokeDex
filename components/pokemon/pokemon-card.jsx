@@ -26,7 +26,7 @@ export const PokemonCard = memo(function PokemonCard({ id, name, types, onClick,
       {/* Mega/Gmax Badges */}
       <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
         {hasMega && (
-          <span className="px-1.5 py-0.5 rounded-md bg-red-500 text-white text-[8px] font-black leading-none shadow-sm border border-white/20 animate-pulse">
+          <span className="px-1.5 py-0.5 rounded-md bg-red-500 text-white text-[8px] font-black leading-none shadow-sm border border-white/20">
             MEGA
           </span>
         )}
