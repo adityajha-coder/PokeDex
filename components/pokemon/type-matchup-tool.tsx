@@ -10,7 +10,9 @@ import {
   typeColors,
   typeEffectiveness,
   capitalize,
-  getOfficialArtwork
+  getOfficialArtwork,
+  extractIdFromUrl,
+  POKEMON_LIMIT
 } from '@/lib/pokemon-api';
 
 interface TypeRelation {
@@ -28,10 +30,10 @@ export const TypeMatchupTool = memo(function TypeMatchupTool() {
 
   useEffect(() => {
     async function loadPokemonList() {
-      const list = await fetchPokemonList(151, 0);
-      setAllPokemon(list.results.map((p, index) => ({
+      const list = await fetchPokemonList(POKEMON_LIMIT, 0);
+      setAllPokemon(list.results.map((p) => ({
         name: p.name,
-        id: index + 1
+        id: extractIdFromUrl(p.url)
       })));
     }
     loadPokemonList();

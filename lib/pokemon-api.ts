@@ -1,4 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_POKEAPI_BASE_URL || 'https://pokeapi.co/api/v2';
+export const POKEMON_LIMIT = 1025; // Generation 1-9 coverage
+
 
 export interface Pokemon {
   id: number;
@@ -9,6 +11,10 @@ export interface Pokemon {
   moves: PokemonMove[];
   height: number;
   weight: number;
+  cries: {
+    latest: string;
+    legacy: string;
+  };
   sprites: Sprites;
   species: { url: string };
 }
@@ -157,12 +163,18 @@ export async function fetchTypeRelations(typeName: string): Promise<TypeRelation
 }
 
 // Fetch all Pokemon (paginated)
-export async function fetchPokemonList(limit = 151, offset = 0): Promise<PokemonListResponse> {
+export async function fetchPokemonList(limit = POKEMON_LIMIT, offset = 0): Promise<PokemonListResponse> {
   const response = await fetch(`${BASE_URL}/pokemon?limit=${limit}&offset=${offset}`);
   if (!response.ok) {
     throw new Error('Failed to fetch Pokemon list');
   }
   return response.json();
+}
+
+// Helper to extract ID from PokeAPI URL
+export function extractIdFromUrl(url: string): number {
+  const parts = url.split('/').filter(Boolean);
+  return parseInt(parts[parts.length - 1], 10);
 }
 
 // Helper to get official artwork URL

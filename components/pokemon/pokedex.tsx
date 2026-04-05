@@ -6,7 +6,9 @@ import {
   fetchPokemon, 
   fetchPokemonList,
   capitalize,
-  typeColors
+  typeColors,
+  POKEMON_LIMIT,
+  extractIdFromUrl
 } from '@/lib/pokemon-api';
 import { PokemonCard } from './pokemon-card';
 import { PokemonDetail } from './pokemon-detail';
@@ -36,7 +38,7 @@ const LEGENDARY_IDS = new Set([
 ]);
 
 const POKEMON_TYPES = Object.keys(typeColors);
-const TOTAL_POKEMON = 1025; // All generations
+const TOTAL_POKEMON = POKEMON_LIMIT;
 const INITIAL_LOAD = 50;
 const BATCH_SIZE = 50;
 
@@ -80,9 +82,9 @@ export const Pokedex = memo(function Pokedex() {
     async function loadAllPokemonBasic() {
       try {
         const listData = await fetchPokemonList(TOTAL_POKEMON, 0);
-        const basicList = listData.results.map((p, index) => ({
+        const basicList = listData.results.map((p) => ({
           name: p.name,
-          id: index + 1
+          id: extractIdFromUrl(p.url)
         }));
         setAllPokemonBasic(basicList);
         

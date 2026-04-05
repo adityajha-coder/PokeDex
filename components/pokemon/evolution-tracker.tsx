@@ -13,7 +13,9 @@ import {
   fetchPokemonList,
   capitalize,
   getOfficialArtwork,
-  typeColors
+  typeColors,
+  extractIdFromUrl,
+  POKEMON_LIMIT 
 } from '@/lib/pokemon-api';
 
 interface EvolutionStage {
@@ -68,10 +70,10 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
   // Load Pokemon list only
   useEffect(() => {
     async function loadPokemonList() {
-      const list = await fetchPokemonList(151, 0);
-      setAllPokemon(list.results.map((p, index) => ({ 
+      const list = await fetchPokemonList(POKEMON_LIMIT, 0);
+      setAllPokemon(list.results.map((p) => ({ 
         name: p.name, 
-        id: index + 1 
+        id: extractIdFromUrl(p.url) 
       })));
     }
     loadPokemonList();
