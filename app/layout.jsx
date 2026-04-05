@@ -2,6 +2,7 @@ import { Poppins, Luckiest_Guy } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 import './globals.css'
+import { Toaster } from '@/components/ui/toaster'
 
 const poppins = Poppins({ 
   subsets: ['latin'],
@@ -46,8 +47,6 @@ export const metadata = {
   },
 }
 
-import { Toaster } from '@/components/ui/toaster'
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
@@ -65,27 +64,7 @@ export default function RootLayout({ children }) {
           {`
             if ('serviceWorker' in navigator) {
               window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
-                  .then((registration) => {
-                    console.log('SW registered:', registration);
-                    registration.onupdatefound = () => {
-                      const installingWorker = registration.installing;
-                      if (installingWorker) {
-                        installingWorker.onstatechange = () => {
-                          if (installingWorker.state === 'installed') {
-                            if (navigator.serviceWorker.controller) {
-                              console.log('New content available; please refresh.');
-                            } else {
-                              console.log('Content is cached for offline use.');
-                            }
-                          }
-                        };
-                      }
-                    };
-                  })
-                  .catch((error) => {
-                    console.log('SW registration failed:', error);
-                  });
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
               });
             }
           `}

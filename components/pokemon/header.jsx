@@ -73,8 +73,8 @@ function NavLink({ href, children, active }) {
       href={href}
       prefetch={true}
       className={`px-5 py-2 rounded-full font-semibold transition-all duration-150 text-sm ${active
-          ? 'bg-[#FACC15] text-[#1E3A5F]'
-          : 'text-white hover:bg-[#FACC15] hover:text-[#1E3A5F]'
+        ? 'bg-[#FACC15] text-[#1E3A5F]'
+        : 'text-white hover:bg-[#FACC15] hover:text-[#1E3A5F]'
         }`}
     >
       {children}
@@ -94,8 +94,8 @@ function MobileNavLink({
       prefetch={true}
       onClick={onClick}
       className={`px-4 py-3 rounded-xl font-semibold transition-all duration-150 text-center ${active
-          ? 'bg-[#FACC15] text-[#1E3A5F]'
-          : 'text-white hover:bg-[#FACC15] hover:text-[#1E3A5F]'
+        ? 'bg-[#FACC15] text-[#1E3A5F]'
+        : 'text-white hover:bg-[#FACC15] hover:text-[#1E3A5F]'
         }`}
     >
       {children}

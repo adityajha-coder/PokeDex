@@ -4,7 +4,7 @@ import { memo } from 'react';
 import Image from 'next/image';
 import { capitalize, formatPokemonId, getOfficialArtwork, typeColors, MEGA_EVOLVABLE_IDS, GMAX_CAPABLE_IDS } from '@/lib/pokemon-api';
 
-export const PokemonCard = memo(function PokemonCard({ id, name, types, onClick, isSelected }) {
+export const PokemonCard = memo(function PokemonCard({ id, name, types, height, weight, onClick, isSelected }) {
   const primaryType = types[0]?.type.name || 'normal';
   const bgColor = typeColors[primaryType] || typeColors.normal;
   const hasMega = MEGA_EVOLVABLE_IDS.has(id);
@@ -18,7 +18,7 @@ export const PokemonCard = memo(function PokemonCard({ id, name, types, onClick,
         hover:scale-105 hover:-translate-y-0.5 cursor-pointer
         ${isSelected ? 'ring-3 ring-white scale-105' : ''}
       `}
-      style={{ 
+      style={{
         backgroundColor: bgColor,
         boxShadow: `0 4px 16px ${bgColor}50`
       }}
@@ -39,13 +39,13 @@ export const PokemonCard = memo(function PokemonCard({ id, name, types, onClick,
 
       {/* Pokeball Background Pattern */}
       <div className="absolute inset-0 overflow-hidden rounded-2xl opacity-10 pointer-events-none">
-        <svg 
-          viewBox="0 0 100 100" 
+        <svg
+          viewBox="0 0 100 100"
           className="absolute -right-6 -top-6 w-24 h-24 text-white"
         >
-          <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="3"/>
-          <path d="M 0 50 A 48 48 0 0 1 100 50" fill="none" stroke="currentColor" strokeWidth="3"/>
-          <circle cx="50" cy="50" r="14" fill="none" stroke="currentColor" strokeWidth="3"/>
+          <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="3" />
+          <path d="M 0 50 A 48 48 0 0 1 100 50" fill="none" stroke="currentColor" strokeWidth="3" />
+          <circle cx="50" cy="50" r="14" fill="none" stroke="currentColor" strokeWidth="3" />
         </svg>
       </div>
 
@@ -71,6 +71,13 @@ export const PokemonCard = memo(function PokemonCard({ id, name, types, onClick,
         {capitalize(name)}
       </h3>
 
+      {/* Height/Weight Badges */}
+      <div className="flex justify-center gap-2 mb-2">
+        <span className="text-white/40 text-[9px] font-bold">{(height / 10).toFixed(1)}m</span>
+        <span className="text-white/20 text-[9px]">•</span>
+        <span className="text-white/40 text-[9px] font-bold">{(weight / 10).toFixed(1)}kg</span>
+      </div>
+
       {/* Types */}
       <div className="flex justify-center gap-1.5 flex-wrap">
         {types.map(({ type }) => (
@@ -82,6 +89,7 @@ export const PokemonCard = memo(function PokemonCard({ id, name, types, onClick,
           </span>
         ))}
       </div>
+
     </button>
   );
 });

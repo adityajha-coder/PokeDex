@@ -288,8 +288,8 @@ export const Pokedex = memo(function Pokedex() {
                       onClick={() => handleGenerationChange(g.gen)}
                       disabled={loadingMore}
                       className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 disabled:opacity-50 ring-2 ${selectedGen === g.gen
-                          ? 'bg-[#FACC15] text-[#1E3A5F] scale-110 shadow-xl ring-[#FACC15] z-10'
-                          : 'bg-white/15 text-white hover:bg-white/25 ring-white/20 hover:scale-105'
+                        ? 'bg-[#FACC15] text-[#1E3A5F] scale-110 shadow-xl ring-[#FACC15] z-10'
+                        : 'bg-white/15 text-white hover:bg-white/25 ring-white/20 hover:scale-105'
                         }`}
                     >
                       {g.name.toUpperCase()}
@@ -327,8 +327,8 @@ export const Pokedex = memo(function Pokedex() {
                   <button
                     onClick={() => setSelectedType('')}
                     className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${!selectedType
-                        ? 'bg-white text-[#1E3A5F] border-white scale-105 shadow-md'
-                        : 'bg-white/20 text-white border-white/10 hover:bg-white/30'
+                      ? 'bg-white text-[#1E3A5F] border-white scale-105 shadow-md'
+                      : 'bg-white/20 text-white border-white/10 hover:bg-white/30'
                       }`}
                   >
                     ALL TYPES
@@ -400,6 +400,8 @@ export const Pokedex = memo(function Pokedex() {
                         id={pokemon.id}
                         name={pokemon.name}
                         types={pokemon.types}
+                        height={pokemon.height}
+                        weight={pokemon.weight}
                         onClick={() => handlePokemonClick(pokemon)}
                         isSelected={selectedPokemon?.id === pokemon.id}
                       />
@@ -430,6 +432,8 @@ export const Pokedex = memo(function Pokedex() {
                         id={pokemon.id}
                         name={pokemon.name}
                         types={pokemon.types}
+                        height={pokemon.height}
+                        weight={pokemon.weight}
                         onClick={() => handlePokemonClick(pokemon)}
                         isSelected={selectedPokemon?.id === pokemon.id}
                       />

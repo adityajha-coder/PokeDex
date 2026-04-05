@@ -3,14 +3,14 @@
 import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
 import { X, Zap, Shield, Swords, Heart, Activity, Footprints, ChevronRight } from 'lucide-react';
-import { 
-  fetchPokemonSpecies, 
+import {
+  fetchPokemonSpecies,
   fetchEvolutionChain,
   fetchPokemon,
-  capitalize, 
-  formatPokemonId, 
+  capitalize,
+  formatPokemonId,
   getOfficialArtwork,
-  typeColors 
+  typeColors
 } from '@/lib/pokemon-api';
 
 export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
@@ -46,16 +46,16 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
 
         const chainData = await fetchEvolutionChain(speciesData.evolution_chain.url);
         const evolutions = [];
-        
+
         const parseChain = async (node) => {
           const pokemonData = await fetchPokemon(node.species.name);
           evolutions.push({ id: pokemonData.id, name: node.species.name });
-          
+
           for (const evolution of node.evolves_to) {
             await parseChain(evolution);
           }
         };
-        
+
         await parseChain(chainData.chain);
         setEvolutionChain(evolutions);
       } catch (error) {
@@ -69,11 +69,11 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
   }, [pokemon.id]);
 
   const primaryType = activePokemon.types[0]?.type.name || 'normal';
-  
+
   const description = species?.flavor_text_entries
     .find(entry => entry.language.name === 'en')
     ?.flavor_text.replace(/\f/g, ' ').replace(/\n/g, ' ') || '';
-  
+
   const category = species?.genera
     .find(g => g.language.name === 'en')
     ?.genus || 'Unknown';
@@ -122,11 +122,11 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
       onClick={onClose}
     >
-      <div 
+      <div
         className="relative w-full max-w-5xl max-h-[90vh] overflow-auto rounded-3xl shadow-2xl animate-bounce-in pokemon-card-yellow"
         onClick={(e) => e.stopPropagation()}
       >
@@ -142,9 +142,9 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
         {/* Background Pokeball watermark */}
         <div className="absolute right-10 top-1/2 -translate-y-1/2 w-80 h-80 opacity-5 pointer-events-none">
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="48" fill="#1E3A5F"/>
-            <rect x="0" y="48" width="100" height="4" fill="#1E3A5F"/>
-            <circle cx="50" cy="50" r="16" fill="none" stroke="#1E3A5F" strokeWidth="4"/>
+            <circle cx="50" cy="50" r="48" fill="#1E3A5F" />
+            <rect x="0" y="48" width="100" height="4" fill="#1E3A5F" />
+            <circle cx="50" cy="50" r="16" fill="none" stroke="#1E3A5F" strokeWidth="4" />
           </svg>
         </div>
 
@@ -193,11 +193,10 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                     {/* Default Form */}
                     <button
                       onClick={() => setActivePokemon(pokemon)}
-                      className={`relative w-14 h-14 rounded-2xl overflow-hidden border-2 transition-all group ${
-                        activePokemon.id === pokemon.id 
-                          ? 'border-[#1E3A5F] bg-white shadow-lg scale-110' 
+                      className={`relative w-14 h-14 rounded-2xl overflow-hidden border-2 transition-all group ${activePokemon.id === pokemon.id
+                          ? 'border-[#1E3A5F] bg-white shadow-lg scale-110'
                           : 'border-[#1E3A5F]/20 bg-white/50 hover:border-[#1E3A5F]'
-                      }`}
+                        }`}
                     >
                       <Image
                         src={getOfficialArtwork(pokemon.id)}
@@ -217,11 +216,10 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                       <button
                         key={variety.id}
                         onClick={() => setActivePokemon(variety.data)}
-                        className={`relative w-14 h-14 rounded-2xl overflow-hidden border-2 transition-all group ${
-                          activePokemon.id === variety.id 
-                            ? 'border-[#1E3A5F] bg-white shadow-lg scale-110' 
+                        className={`relative w-14 h-14 rounded-2xl overflow-hidden border-2 transition-all group ${activePokemon.id === variety.id
+                            ? 'border-[#1E3A5F] bg-white shadow-lg scale-110'
                             : 'border-[#1E3A5F]/20 bg-white/50 hover:border-[#1E3A5F]'
-                        }`}
+                          }`}
                       >
                         <Image
                           src={getOfficialArtwork(variety.id)}
@@ -229,9 +227,8 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                           fill
                           className="object-contain p-1"
                         />
-                        <div className={`absolute inset-x-0 bottom-0 text-white text-[8px] font-bold text-center py-0.5 ${
-                          variety.isMega ? 'bg-[#EF4444]' : variety.isGmax ? 'bg-[#A855F7]' : 'bg-[#1E3A5F]'
-                        }`}>
+                        <div className={`absolute inset-x-0 bottom-0 text-white text-[8px] font-bold text-center py-0.5 ${variety.isMega ? 'bg-[#EF4444]' : variety.isGmax ? 'bg-[#A855F7]' : 'bg-[#1E3A5F]'
+                          }`}>
                           {variety.isMega ? 'MEGA' : variety.isGmax ? 'GMAX' : 'FORM'}
                         </div>
                       </button>
@@ -243,22 +240,22 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
               {/* Moves Section */}
               <div className="space-y-3">
                 <p className="text-[#1E3A5F]/40 text-[10px] font-black tracking-[0.3em] uppercase">Signature Moves</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {activePokemon.moves
-                      .filter(m => m.version_group_details.some(v => v.move_learn_method.name === 'level-up'))
-                      .slice(0, 12)
-                      .map(({ move }) => (
-                        <div 
-                          key={move.name}
-                          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[#1E3A5F]/10 border border-[#1E3A5F]/20 group hover:bg-[#1E3A5F] hover:shadow-md transition-all cursor-default"
-                        >
-                          <Zap size={14} className="text-[#1E3A5F] group-hover:text-white" />
-                          <span className="text-[10px] font-black text-[#1E3A5F] uppercase tracking-wider group-hover:text-white truncate">
-                            {capitalize(move.name)}
-                          </span>
-                        </div>
-                      ))}
-                  </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {activePokemon.moves
+                    .filter(m => m.version_group_details.some(v => v.move_learn_method.name === 'level-up'))
+                    .slice(0, 12)
+                    .map(({ move }) => (
+                      <div
+                        key={move.name}
+                        className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[#1E3A5F]/10 border border-[#1E3A5F]/20 group hover:bg-[#1E3A5F] hover:shadow-md transition-all cursor-default"
+                      >
+                        <Zap size={14} className="text-[#1E3A5F] group-hover:text-white" />
+                        <span className="text-[10px] font-black text-[#1E3A5F] uppercase tracking-wider group-hover:text-white truncate">
+                          {capitalize(move.name)}
+                        </span>
+                      </div>
+                    ))}
+                </div>
               </div>
             </div>
 
@@ -279,9 +276,9 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                       <span className="text-[#1E3A5F] font-black text-xs">{base_stat}</span>
                     </div>
                     <div className="flex-1 bg-[#1E3A5F]/10 rounded-full h-2.5 overflow-hidden border border-[#1E3A5F]/5">
-                      <div 
+                      <div
                         className="h-full rounded-full transition-all duration-700 ease-out"
-                        style={{ 
+                        style={{
                           width: `${Math.min(100, (base_stat / 160) * 100)}%`,
                           backgroundColor: base_stat > 110 ? '#22c55e' : base_stat > 70 ? '#2563eb' : '#ef4444'
                         }}
@@ -297,13 +294,17 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
 
           {/* Right Column - Image & Evolution */}
           <div className="flex flex-col items-center justify-center relative">
-            {/* Height & Weight indicators */}
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col items-start gap-1 text-[#1E3A5F]/60 text-xs">
-              <span>Height: {(activePokemon.height / 10).toFixed(1)}m</span>
+            <div className="flex gap-4 mb-6">
+              <div className="flex flex-col items-center px-4 py-2 bg-[#1E3A5F]/10 rounded-2xl border border-[#1E3A5F]/10">
+                <span className="text-[#1E3A5F]/40 text-[10px] font-black uppercase tracking-wider">Height</span>
+                <span className="text-[#1E3A5F] font-bold text-sm">{(activePokemon.height / 10).toFixed(1)}m</span>
+              </div>
+              <div className="flex flex-col items-center px-4 py-2 bg-[#1E3A5F]/10 rounded-2xl border border-[#1E3A5F]/10">
+                <span className="text-[#1E3A5F]/40 text-[10px] font-black uppercase tracking-wider">Weight</span>
+                <span className="text-[#1E3A5F] font-bold text-sm">{(activePokemon.weight / 10).toFixed(1)}kg</span>
+              </div>
             </div>
-            <div className="absolute bottom-20 right-0 text-[#1E3A5F]/60 text-xs">
-              Weight: {(activePokemon.weight / 10).toFixed(1)}kg
-            </div>
+
 
             {/* Main Pokemon Image */}
             <div className="relative w-64 h-64 md:w-80 md:h-80 animate-float">
@@ -320,13 +321,12 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
             {evolutionChain.length > 0 && (
               <div className="flex gap-3 mt-4">
                 {evolutionChain.slice(0, 3).map((evo) => (
-                  <div 
-                    key={evo.id} 
-                    className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
-                      evo.id === pokemon.id 
-                        ? 'border-[#1E3A5F] bg-white shadow-lg scale-110' 
+                  <div
+                    key={evo.id}
+                    className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${evo.id === pokemon.id
+                        ? 'border-[#1E3A5F] bg-white shadow-lg scale-110'
                         : 'border-[#1E3A5F]/20 bg-white/50'
-                    }`}
+                      }`}
                   >
                     <Image
                       src={getOfficialArtwork(evo.id)}
