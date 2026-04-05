@@ -12,7 +12,28 @@ import { PokemonCard } from './pokemon-card';
 import { PokemonDetail } from './pokemon-detail';
 import { SearchBar } from './search-bar';
 import { LoadingSpinner, GridSkeleton } from './loading-spinner';
-import { ChevronDown, Filter } from 'lucide-react';
+import { ChevronDown, Filter, Crown } from 'lucide-react';
+
+const LEGENDARY_IDS = new Set([
+  // Gen 1
+  144, 145, 146, 150, 151,
+  // Gen 2
+  243, 244, 245, 249, 250, 251,
+  // Gen 3
+  377, 378, 379, 380, 381, 382, 383, 384, 385, 386,
+  // Gen 4
+  480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493,
+  // Gen 5
+  494, 638, 639, 640, 641, 642, 643, 644, 645, 646, 647, 648, 649,
+  // Gen 6
+  716, 717, 718, 719, 720, 721,
+  // Gen 7
+  772, 773, 785, 786, 787, 788, 789, 790, 791, 792, 793, 794, 795, 796, 797, 798, 799, 800, 801, 802, 803, 804, 805, 806, 807, 808, 809,
+  // Gen 8
+  888, 889, 890, 891, 892, 893, 894, 895, 896, 897, 898, 905,
+  // Gen 9
+  1001, 1002, 1003, 1004, 1007, 1008, 1010, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025
+]);
 
 const POKEMON_TYPES = Object.keys(typeColors);
 const TOTAL_POKEMON = 1025; // All generations
@@ -34,6 +55,7 @@ export const Pokedex = memo(function Pokedex() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
+  const [showLegendariesOnly, setShowLegendariesOnly] = useState(false);
   const [visibleCount, setVisibleCount] = useState(INITIAL_LOAD);
   const [selectedGen, setSelectedGen] = useState<number>(0);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -189,8 +211,12 @@ export const Pokedex = memo(function Pokedex() {
       );
     }
 
+    if (showLegendariesOnly) {
+      filtered = filtered.filter(p => LEGENDARY_IDS.has(p.id));
+    }
+
     return filtered;
-  }, [searchQuery, selectedType, loadedPokemon, selectedGen, generations]);
+  }, [searchQuery, selectedType, loadedPokemon, selectedGen, generations, showLegendariesOnly]);
 
   // Handle search
   const handleSearch = useCallback((query: string) => {
@@ -268,17 +294,30 @@ export const Pokedex = memo(function Pokedex() {
 
         {/* Type Filter */}
         <div className="mb-6">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 mx-auto px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors font-medium text-sm"
-          >
-            <Filter size={16} />
-            <span>Filter by Type</span>
-            <ChevronDown 
-              size={16} 
-              className={`transition-transform duration-150 ${showFilters ? 'rotate-180' : ''}`}
-            />
-          </button>
+          <div className="flex justify-center gap-3">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors font-medium text-sm ${
+                showFilters ? 'bg-white text-[#1E3A5F]' : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              <Filter size={16} />
+              <span>Types</span>
+              <ChevronDown 
+                size={16} 
+                className={`transition-transform duration-150 ${showFilters ? 'rotate-180' : ''}`}
+              />
+            </button>
+            <button
+              onClick={() => setShowLegendariesOnly(!showLegendariesOnly)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors font-medium text-sm ${
+                showLegendariesOnly ? 'bg-[#FACC15] text-[#1E3A5F]' : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              <Crown size={16} />
+              <span>Legendaries</span>
+            </button>
+          </div>
 
           {showFilters && (
             <div className="flex flex-wrap justify-center gap-2 mt-3 animate-slide-up max-w-4xl mx-auto">
@@ -335,23 +374,69 @@ export const Pokedex = memo(function Pokedex() {
             <p className="text-white/50 text-sm">Try a different search or filter</p>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-              {filteredList.map((pokemon) => (
-                <MemoizedPokemonCard
-                  key={pokemon.id}
-                  id={pokemon.id}
-                  name={pokemon.name}
-                  types={pokemon.types}
-                  onClick={() => handlePokemonClick(pokemon)}
-                  isSelected={selectedPokemon?.id === pokemon.id}
-                />
-              ))}
-            </div>
+          <div className="space-y-10">
+            {/* Legendaries Section */}
+            {(() => {
+              const legendaries = filteredList.filter(p => LEGENDARY_IDS.has(p.id));
+              if (legendaries.length === 0) return null;
+              return (
+                <div className="animate-fade-in">
+                  <div className="flex items-center gap-3 mb-6 px-1">
+                    <Crown className="text-[#FACC15]" size={24} />
+                    <h2 className="text-2xl font-black text-white tracking-tight uppercase">
+                      Legendaries & Mythicals
+                    </h2>
+                    <div className="h-1 flex-1 bg-gradient-to-r from-[#FACC15]/30 to-transparent rounded-full ml-4" />
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                    {legendaries.map((pokemon) => (
+                      <MemoizedPokemonCard
+                        key={`legendary-${pokemon.id}`}
+                        id={pokemon.id}
+                        name={pokemon.name}
+                        types={pokemon.types}
+                        onClick={() => handlePokemonClick(pokemon)}
+                        isSelected={selectedPokemon?.id === pokemon.id}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Regular Pokemon Section */}
+            {(() => {
+              const regular = filteredList.filter(p => !LEGENDARY_IDS.has(p.id));
+              if (regular.length === 0) return null;
+              return (
+                <div className="animate-fade-in">
+                  {filteredList.some(p => LEGENDARY_IDS.has(p.id)) && (
+                    <div className="flex items-center gap-3 mb-6 px-1 pt-4">
+                      <h2 className="text-2xl font-black text-white/40 tracking-tight uppercase">
+                        All Pokemon
+                      </h2>
+                      <div className="h-px flex-1 bg-white/10 rounded-full ml-4" />
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                    {regular.map((pokemon) => (
+                      <MemoizedPokemonCard
+                        key={`regular-${pokemon.id}`}
+                        id={pokemon.id}
+                        name={pokemon.name}
+                        types={pokemon.types}
+                        onClick={() => handlePokemonClick(pokemon)}
+                        isSelected={selectedPokemon?.id === pokemon.id}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Load More Trigger */}
-            {!searchQuery && !selectedType && selectedGen === 0 && visibleCount < TOTAL_POKEMON && (
-              <div ref={loadMoreRef} className="text-center mt-8 py-6">
+            {!searchQuery && !selectedType && !showLegendariesOnly && selectedGen === 0 && visibleCount < TOTAL_POKEMON && (
+              <div ref={loadMoreRef} className="text-center py-6">
                 {loadingMore ? (
                   <LoadingSpinner message="Loading..." />
                 ) : (
@@ -364,7 +449,7 @@ export const Pokedex = memo(function Pokedex() {
                 )}
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
 
