@@ -1,0 +1,25 @@
+{
+  "name": "PokeDex",
+  "short_name": "PokeDex",
+  "description": "Complete Pokemon database with all generations - type matchups, and evolution tracking",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2563EB",
+  "theme_color": "#FACC15",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/favicon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["games", "entertainment"]
+}
