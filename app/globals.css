@@ -211,6 +211,24 @@ html {
   will-change: transform;
 }
 
+.pokemon-logo {
+  font-family: var(--font-pokemon), var(--font-sans);
+  color: #ffcb05;
+  -webkit-text-stroke: 1.5px #3b4cca;
+  text-shadow: 
+    3px 3px 0px #3b4cca,
+    -1px -1px 0 #3b4cca,  
+    1px -1px 0 #3b4cca,
+    -1px 1px 0 #3b4cca,
+    1px 1px 0 #3b4cca;
+  letter-spacing: 0.05em;
+}
+
+@theme inline {
+  --font-pokemon: var(--font-pokemon);
+}
+
 img {
   content-visibility: auto;
 }
+

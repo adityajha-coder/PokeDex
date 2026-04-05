@@ -203,10 +203,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
               </div>
             </div>
 
-            {/* Learn More Link */}
-            <button className="flex items-center gap-2 text-[#1E3A5F] font-semibold text-sm hover:gap-3 transition-all">
-              LEARN MORE <ChevronRight size={16} />
-            </button>
+
           </div>
 
           {/* Right Column - Image & Evolution */}

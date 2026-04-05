@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Poppins } from 'next/font/google'
+import { Poppins, Luckiest_Guy } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 import './globals.css'
@@ -8,6 +8,12 @@ const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
   variable: '--font-poppins',
+})
+
+const pokemonFont = Luckiest_Guy({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-pokemon',
 })
 
 export const viewport: Viewport = {
@@ -55,7 +61,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className={`${poppins.variable} font-sans antialiased`}>
+      <body className={`${poppins.variable} ${pokemonFont.variable} font-sans antialiased`}>
         {children}
         <Script id="service-worker" strategy="afterInteractive">
           {`

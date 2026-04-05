@@ -254,106 +254,115 @@ export const Pokedex = memo(function Pokedex() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Hero Section */}
-        <div className="text-center mb-6">
-          <h1 
-            className="text-4xl md:text-6xl font-extrabold text-[#FACC15] mb-3"
-            style={{ textShadow: '3px 3px 0 #1E3A5F' }}
-          >
+        <div className="text-center mb-8">
+          <h1 className="text-6xl md:text-8xl pokemon-logo mb-4 tracking-wider">
             POKEDEX
           </h1>
-          <p className="text-white/70 text-base max-w-xl mx-auto">
-            Browse {TOTAL_POKEMON.toLocaleString()} Pokemon across all generations
+          <p className="text-white text-lg font-bold max-w-xl mx-auto uppercase tracking-[0.2em]">
+            Digital World Encyclopedia
+          </p>
+          <p className="text-white/70 text-sm mt-1">
+            Browse {TOTAL_POKEMON.toLocaleString()} Pokemon across all regions
           </p>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-4">
-          <SearchBar 
-            onSearch={handleSearch} 
-            isLoading={loading}
-          />
-        </div>
+        {/* Dashboard Control Panel */}
+        <div className="mb-10 p-1 bg-white/10 backdrop-blur-md rounded-[2rem] border border-white/20 shadow-2xl">
+          <div className="p-6 md:p-8 space-y-6">
+            {/* Search Bar */}
+            <SearchBar 
+              onSearch={handleSearch} 
+              isLoading={loading}
+            />
 
-        {/* Generation Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-4">
-          {generations.map(g => (
-            <button
-              key={g.gen}
-              onClick={() => handleGenerationChange(g.gen)}
-              disabled={loadingMore}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 disabled:opacity-50 ${
-                selectedGen === g.gen 
-                  ? 'bg-[#FACC15] text-[#1E3A5F] scale-105' 
-                  : 'bg-white/15 text-white hover:bg-white/25'
-              }`}
-            >
-              {g.name}
-            </button>
-          ))}
-        </div>
+            {/* Filter Section */}
+            <div className="space-y-6">
+              {/* Generation Filter */}
+              <div className="flex flex-col items-center gap-3">
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Select Region</span>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {generations.map(g => (
+                    <button
+                      key={g.gen}
+                      onClick={() => handleGenerationChange(g.gen)}
+                      disabled={loadingMore}
+                      className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 disabled:opacity-50 ring-1 ${
+                        selectedGen === g.gen 
+                          ? 'bg-[#FACC15] text-[#1E3A5F] scale-110 shadow-lg ring-[#FACC15]' 
+                          : 'bg-white/5 text-white hover:bg-white/15 ring-white/10'
+                      }`}
+                    >
+                      {g.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-        {/* Type Filter */}
-        <div className="mb-6">
-          <div className="flex justify-center gap-3">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors font-medium text-sm ${
-                showFilters ? 'bg-white text-[#1E3A5F]' : 'bg-white/10 text-white hover:bg-white/20'
-              }`}
-            >
-              <Filter size={16} />
-              <span>Types</span>
-              <ChevronDown 
-                size={16} 
-                className={`transition-transform duration-150 ${showFilters ? 'rotate-180' : ''}`}
-              />
-            </button>
-            <button
-              onClick={() => setShowLegendariesOnly(!showLegendariesOnly)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors font-medium text-sm ${
-                showLegendariesOnly ? 'bg-[#FACC15] text-[#1E3A5F]' : 'bg-white/10 text-white hover:bg-white/20'
-              }`}
-            >
-              <Crown size={16} />
-              <span>Legendaries</span>
-            </button>
-          </div>
-
-          {showFilters && (
-            <div className="flex flex-wrap justify-center gap-2 mt-3 animate-slide-up max-w-4xl mx-auto">
-              <button
-                onClick={() => setSelectedType('')}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                  !selectedType 
-                    ? 'bg-white text-[#1E3A5F] scale-105' 
-                    : 'bg-white/20 text-white hover:bg-white/30'
-                }`}
-              >
-                All
-              </button>
-              {POKEMON_TYPES.map(type => (
+              {/* Action Buttons */}
+              <div className="flex justify-center gap-4">
                 <button
-                  key={type}
-                  onClick={() => setSelectedType(type === selectedType ? '' : type)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all text-white ${
-                    selectedType === type ? 'ring-2 ring-white scale-105' : 'hover:scale-105'
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-2xl transition-all font-bold text-sm ring-1 ${
+                    showFilters ? 'bg-white text-[#1E3A5F] ring-white' : 'bg-white/5 text-white hover:bg-white/10 ring-white/20'
                   }`}
-                  style={{ backgroundColor: typeColors[type] }}
                 >
-                  {capitalize(type)}
+                  <Filter size={18} />
+                  <span>Filter by Type</span>
+                  <ChevronDown 
+                    size={18} 
+                    className={`transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`}
+                  />
                 </button>
-              ))}
+                <button
+                  onClick={() => setShowLegendariesOnly(!showLegendariesOnly)}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-2xl transition-all font-bold text-sm ring-1 ${
+                    showLegendariesOnly ? 'bg-[#FACC15] text-[#1E3A5F] ring-[#FACC15] shadow-lg' : 'bg-white/5 text-white hover:bg-white/10 ring-white/20'
+                  }`}
+                >
+                  <Crown size={18} />
+                  <span>Legendaries</span>
+                </button>
+              </div>
+
+              {showFilters && (
+                <div className="pt-4 border-t border-white/5 flex flex-wrap justify-center gap-2 animate-slide-up">
+                  <button
+                    onClick={() => setSelectedType('')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                      !selectedType 
+                        ? 'bg-white text-[#1E3A5F] scale-105' 
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                  >
+                    All Types
+                  </button>
+                  {POKEMON_TYPES.map(type => (
+                    <button
+                      key={type}
+                      onClick={() => setSelectedType(type === selectedType ? '' : type)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all text-white shadow-sm ${
+                        selectedType === type ? 'ring-2 ring-white scale-110 z-10' : 'opacity-80 hover:opacity-100 hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: typeColors[type] }}
+                    >
+                      {capitalize(type)}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         {/* Results Count */}
         {!loading && (
-          <p className="text-center text-white/50 mb-4 text-xs">
+          <p className="text-center text-white mb-6 text-sm font-bold tracking-widest uppercase">
             {loadingMore && selectedGen > 0 ? (
-              <span>Loading {generations.find(g => g.gen === selectedGen)?.name} Pokemon...</span>
+              <span className="animate-pulse">Accessing {generations.find(g => g.gen === selectedGen)?.name} data...</span>
             ) : (
-              <span>{filteredList.length} Pokemon {selectedType && `(${capitalize(selectedType)})`} {selectedGen > 0 && `• ${generations.find(g => g.gen === selectedGen)?.name}`}</span>
+              <span className="px-4 py-1.5 bg-black/20 rounded-full">
+                {filteredList.length} Units Found {selectedType && `• ${capitalize(selectedType)}`} {selectedGen > 0 && `• ${generations.find(g => g.gen === selectedGen)?.name}`}
+              </span>
             )}
           </p>
         )}

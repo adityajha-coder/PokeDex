@@ -9,7 +9,7 @@ import { Menu, X } from 'lucide-react';
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
-  
+
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
 
   return (
@@ -25,7 +25,7 @@ export function Header() {
             className="drop-shadow-lg group-hover:scale-110 transition-transform duration-200"
             priority
           />
-          <span 
+          <span
             className="text-2xl font-extrabold text-[#FACC15] tracking-tight"
             style={{ textShadow: '2px 2px 0 #1E3A5F' }}
           >
@@ -75,25 +75,24 @@ function NavLink({ href, children, active }: { href: string; children: React.Rea
     <Link
       href={href}
       prefetch={true}
-      className={`px-5 py-2 rounded-full font-semibold transition-all duration-150 text-sm ${
-        active 
-          ? 'bg-[#FACC15] text-[#1E3A5F]' 
+      className={`px-5 py-2 rounded-full font-semibold transition-all duration-150 text-sm ${active
+          ? 'bg-[#FACC15] text-[#1E3A5F]'
           : 'text-white hover:bg-[#FACC15] hover:text-[#1E3A5F]'
-      }`}
+        }`}
     >
       {children}
     </Link>
   );
 }
 
-function MobileNavLink({ 
-  href, 
-  children, 
+function MobileNavLink({
+  href,
+  children,
   onClick,
   active
-}: { 
-  href: string; 
-  children: React.ReactNode; 
+}: {
+  href: string;
+  children: React.ReactNode;
   onClick: () => void;
   active?: boolean;
 }) {
@@ -102,11 +101,10 @@ function MobileNavLink({
       href={href}
       prefetch={true}
       onClick={onClick}
-      className={`px-4 py-3 rounded-xl font-semibold transition-all duration-150 text-center ${
-        active 
-          ? 'bg-[#FACC15] text-[#1E3A5F]' 
+      className={`px-4 py-3 rounded-xl font-semibold transition-all duration-150 text-center ${active
+          ? 'bg-[#FACC15] text-[#1E3A5F]'
           : 'text-white hover:bg-[#FACC15] hover:text-[#1E3A5F]'
-      }`}
+        }`}
     >
       {children}
     </Link>

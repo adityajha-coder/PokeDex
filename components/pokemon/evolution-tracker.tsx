@@ -375,19 +375,12 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
                     NAME
                   </span>
                   <span 
-                    className="text-xs font-bold tracking-[0.3em] text-white/20 uppercase"
+                    className="text-xs font-bold tracking-[0.3em] text-white/40 uppercase"
                     style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
                   >
                     ABOUT
                   </span>
                 </div>
-                <button 
-                  className="text-xs font-bold tracking-[0.2em] text-white/20 uppercase hover:text-white/40 transition-colors"
-                  style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
-                  onClick={() => setShowSearch(true)}
-                >
-                  LEARN MORE
-                </button>
               </div>
 
               {/* Left Content - Pokemon Info */}
@@ -443,7 +436,7 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
                 </div>
 
                 {/* Description */}
-                <p className="text-white/60 text-sm leading-relaxed max-w-sm">
+                <p className="text-white text-sm leading-relaxed max-w-sm">
                   {getDescription(activeSpecies)}
                 </p>
 
@@ -775,15 +768,14 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
         <div className="max-w-4xl mx-auto relative z-10">
           {/* Hero Section */}
           <div className="text-center mb-10 pt-8">
-            <h1 
-              className="text-5xl md:text-7xl font-extrabold text-[#FACC15] mb-4"
-              style={{ textShadow: '3px 3px 0 #1E3A5F' }}
-            >
+          <div className="text-center mb-10 pt-8">
+            <h1 className="text-5xl md:text-7xl pokemon-logo mb-6 tracking-widest">
               EVOLUTION TRACKER
             </h1>
-            <p className="text-white/60 text-lg max-w-xl mx-auto">
-              Search for any Pokemon to explore its full evolution chain, stats, and more
+            <p className="text-white text-lg font-bold max-w-xl mx-auto uppercase tracking-wider">
+              Regional Evolution & Growth Analysis
             </p>
+          </div>
           </div>
 
           {/* Inline Search */}
