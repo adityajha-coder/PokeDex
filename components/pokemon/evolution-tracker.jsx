@@ -4,9 +4,6 @@ import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import Image from 'next/image';
 import { Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { 
-  Pokemon,
-  PokemonSpecies,
-  EvolutionChain,
   fetchPokemon,
   fetchPokemonSpecies,
   fetchEvolutionChain,
@@ -18,20 +15,8 @@ import {
   POKEMON_LIMIT 
 } from '@/lib/pokemon-api';
 
-interface EvolutionStage {
-  pokemon: Pokemon;
-  species: PokemonSpecies;
-  evolutionDetails: {
-    trigger: string;
-    minLevel?: number;
-    item?: string;
-    happiness?: boolean;
-    time?: string;
-  } | null;
-}
-
 // Weakness mapping for common types
-const typeWeaknesses: Record<string, string[]> = {
+const typeWeaknesses = {
   normal: ['fighting'],
   fire: ['water', 'ground', 'rock'],
   water: ['electric', 'grass'],
@@ -54,18 +39,18 @@ const typeWeaknesses: Record<string, string[]> = {
 
 export const EvolutionTracker = memo(function EvolutionTracker() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<{ name: string; id: number }[]>([]);
-  const [allPokemon, setAllPokemon] = useState<{ name: string; id: number }[]>([]);
-  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
-  const [selectedSpecies, setSelectedSpecies] = useState<PokemonSpecies | null>(null);
-  const [evolutionData, setEvolutionData] = useState<EvolutionStage[]>([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [allPokemon, setAllPokemon] = useState([]);
+  const [selectedPokemon, setSelectedPokemon] = useState(null);
+  const [selectedSpecies, setSelectedSpecies] = useState(null);
+  const [evolutionData, setEvolutionData] = useState([]);
   const [activeStageIndex, setActiveStageIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [landingSearch, setLandingSearch] = useState('');
-  const [landingResults, setLandingResults] = useState<{ name: string; id: number }[]>([]);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const landingInputRef = useRef<HTMLInputElement>(null);
+  const [landingResults, setLandingResults] = useState([]);
+  const searchInputRef = useRef(null);
+  const landingInputRef = useRef(null);
 
   // Load Pokemon list only
   useEffect(() => {
@@ -113,8 +98,8 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
   }, [showSearch]);
 
   // Parse evolution chain
-  const parseEvolutionChain = useCallback(async (chain: EvolutionChain['chain']): Promise<EvolutionStage[]> => {
-    const stages: EvolutionStage[] = [];
+  const parseEvolutionChain = useCallback(async (chain) => {
+    const stages = [];
     let currentNode = chain;
 
     while (currentNode) {
@@ -140,7 +125,7 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
   }, []);
 
   // Select Pokemon
-  const selectPokemonById = useCallback(async (nameOrId: string | number) => {
+  const selectPokemonById = useCallback(async (nameOrId) => {
     setLoading(true);
     setShowSearch(false);
     setSearchQuery('');
@@ -169,21 +154,21 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
   }, [parseEvolutionChain]);
 
   // Get English description
-  const getDescription = (species: PokemonSpecies | null) => {
+  const getDescription = (species) => {
     if (!species) return '';
     const entry = species.flavor_text_entries.find(e => e.language.name === 'en');
     return entry?.flavor_text.replace(/[\n\f\r]/g, ' ') || '';
   };
 
   // Get category/genus
-  const getCategory = (species: PokemonSpecies | null) => {
+  const getCategory = (species) => {
     if (!species) return '';
     const genus = species.genera.find(g => g.language.name === 'en');
     return genus?.genus.replace(' Pokémon', '') || '';
   };
 
   // Get weaknesses from primary type
-  const getWeaknesses = (pokemon: Pokemon | null) => {
+  const getWeaknesses = (pokemon) => {
     if (!pokemon) return [];
     const primaryType = pokemon.types[0]?.type.name || 'normal';
     return typeWeaknesses[primaryType] || [];
@@ -198,7 +183,7 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
   };
 
   // Navigate stages
-  const goToStage = (index: number) => {
+  const goToStage = (index) => {
     if (index >= 0 && index < evolutionData.length) {
       setActiveStageIndex(index);
       const stage = evolutionData[index];
@@ -633,7 +618,7 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
                   {/* Stats Rows */}
                   <div className="space-y-3">
                     {(() => {
-                      const statConfig: Record<string, { label: string; icon: string; color: string; gradient: string }> = {
+                      const statConfig = {
                         'hp': { label: 'HP', icon: '❤️', color: '#4ade80', gradient: 'from-emerald-500 to-green-400' },
                         'attack': { label: 'ATK', icon: '⚔️', color: '#f87171', gradient: 'from-red-500 to-orange-400' },
                         'defense': { label: 'DEF', icon: '🛡️', color: '#60a5fa', gradient: 'from-blue-500 to-cyan-400' },
@@ -726,7 +711,7 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
                         <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest">Base Stat Total</p>
                         <p className="text-white text-lg font-extrabold">
                           {activePokemon.stats.reduce((sum, s) => sum + s.base_stat, 0)} 
-                          <span className="text-white/20 text-xs font-medium ml-1">/ 720</span>
+                          <span className="text-white/20 text-xs font-medium ml-1">/ 1025</span>
                         </p>
                       </div>
                     </div>
@@ -770,14 +755,12 @@ export const EvolutionTracker = memo(function EvolutionTracker() {
         <div className="max-w-4xl mx-auto relative z-10">
           {/* Hero Section */}
           <div className="text-center mb-10 pt-8">
-          <div className="text-center mb-10 pt-8">
             <h1 className="text-5xl md:text-7xl pokemon-logo mb-6 tracking-widest">
               EVOLUTION TRACKER
             </h1>
             <p className="text-white text-lg font-bold max-w-xl mx-auto uppercase tracking-wider">
               Regional Evolution & Growth Analysis
             </p>
-          </div>
           </div>
 
           {/* Inline Search */}

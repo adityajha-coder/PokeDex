@@ -70,7 +70,7 @@ export function Header() {
   );
 }
 
-function NavLink({ href, children, active }: { href: string; children: React.ReactNode; active?: boolean }) {
+function NavLink({ href, children, active }) {
   return (
     <Link
       href={href}
@@ -90,11 +90,6 @@ function MobileNavLink({
   children,
   onClick,
   active
-}: {
-  href: string;
-  children: React.ReactNode;
-  onClick: () => void;
-  active?: boolean;
 }) {
   return (
     <Link

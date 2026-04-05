@@ -2,7 +2,7 @@
 
 import { memo } from 'react';
 
-export const LoadingSpinner = memo(function LoadingSpinner({ message = 'Loading Pokemon...' }: { message?: string }) {
+export const LoadingSpinner = memo(function LoadingSpinner({ message = 'Loading Pokemon...' }) {
   return (
     <div className="flex flex-col items-center justify-center py-8 gap-4">
       <div className="relative w-12 h-12 animate-pokeball-spin">
@@ -33,7 +33,7 @@ export const CardSkeleton = memo(function CardSkeleton() {
   );
 });
 
-export const GridSkeleton = memo(function GridSkeleton({ count = 12 }: { count?: number }) {
+export const GridSkeleton = memo(function GridSkeleton({ count = 12 }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
       {Array.from({ length: count }).map((_, i) => (

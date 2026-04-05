@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
 import { 
-  Pokemon, 
   fetchPokemon, 
   fetchPokemonList,
   capitalize,
@@ -43,25 +42,25 @@ const INITIAL_LOAD = 50;
 const BATCH_SIZE = 50;
 
 // Cache for Pokemon data - persists across renders
-const pokemonCache = new Map<number, Pokemon>();
+const pokemonCache = new Map();
 
 // Memoized Pokemon Card wrapper
 const MemoizedPokemonCard = memo(PokemonCard);
 
 export const Pokedex = memo(function Pokedex() {
-  const [allPokemonBasic, setAllPokemonBasic] = useState<{name: string; id: number}[]>([]);
-  const [loadedPokemon, setLoadedPokemon] = useState<Pokemon[]>([]);
-  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
+  const [allPokemonBasic, setAllPokemonBasic] = useState([]);
+  const [loadedPokemon, setLoadedPokemon] = useState([]);
+  const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState<string>('');
+  const [selectedType, setSelectedType] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [showLegendariesOnly, setShowLegendariesOnly] = useState(false);
   const [visibleCount, setVisibleCount] = useState(INITIAL_LOAD);
-  const [selectedGen, setSelectedGen] = useState<number>(0);
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [selectedGen, setSelectedGen] = useState(0);
+  const observerRef = useRef(null);
+  const loadMoreRef = useRef(null);
 
   // Generation ranges
   const generations = useMemo(() => [
@@ -101,11 +100,11 @@ export const Pokedex = memo(function Pokedex() {
   }, []);
 
   // Efficient batch loading with caching
-  const loadPokemonBatch = useCallback(async (batch: {name: string; id: number}[]) => {
+  const loadPokemonBatch = useCallback(async (batch) => {
     const toLoad = batch.filter(p => !pokemonCache.has(p.id));
     
     if (toLoad.length === 0) {
-      const cached = batch.map(p => pokemonCache.get(p.id)!).filter(Boolean);
+      const cached = batch.map(p => pokemonCache.get(p.id)).filter(Boolean);
       setLoadedPokemon(prev => {
         const existingIds = new Set(prev.map(p => p.id));
         const newPokemon = cached.filter(p => !existingIds.has(p.id));
@@ -119,7 +118,7 @@ export const Pokedex = memo(function Pokedex() {
       toLoad.map(p => fetchPokemon(p.id))
     );
 
-    const newPokemon: Pokemon[] = [];
+    const newPokemon = [];
     results.forEach((result, index) => {
       if (result.status === 'fulfilled') {
         pokemonCache.set(toLoad[index].id, result.value);
@@ -165,7 +164,7 @@ export const Pokedex = memo(function Pokedex() {
   }, [visibleCount, allPokemonBasic, loadingMore, loadPokemonBatch]);
 
   // Load Pokemon for selected generation
-  const handleGenerationChange = useCallback(async (gen: number) => {
+  const handleGenerationChange = useCallback(async (gen) => {
     setSelectedGen(gen);
     
     if (gen === 0) return; // "All" doesn't need special loading
@@ -221,7 +220,7 @@ export const Pokedex = memo(function Pokedex() {
   }, [searchQuery, selectedType, loadedPokemon, selectedGen, generations, showLegendariesOnly]);
 
   // Handle search
-  const handleSearch = useCallback((query: string) => {
+  const handleSearch = useCallback((query) => {
     setSearchQuery(query);
     
     // If searching for a specific ID, try to load it
@@ -238,7 +237,7 @@ export const Pokedex = memo(function Pokedex() {
   }, []);
 
   // Handle Pokemon card click
-  const handlePokemonClick = useCallback((pokemon: Pokemon) => {
+  const handlePokemonClick = useCallback((pokemon) => {
     setSelectedPokemon(pokemon);
   }, []);
 

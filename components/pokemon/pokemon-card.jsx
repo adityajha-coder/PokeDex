@@ -2,19 +2,13 @@
 
 import { memo } from 'react';
 import Image from 'next/image';
-import { capitalize, formatPokemonId, getOfficialArtwork, typeColors } from '@/lib/pokemon-api';
+import { capitalize, formatPokemonId, getOfficialArtwork, typeColors, MEGA_EVOLVABLE_IDS, GMAX_CAPABLE_IDS } from '@/lib/pokemon-api';
 
-interface PokemonCardProps {
-  id: number;
-  name: string;
-  types: { type: { name: string } }[];
-  onClick?: () => void;
-  isSelected?: boolean;
-}
-
-export const PokemonCard = memo(function PokemonCard({ id, name, types, onClick, isSelected }: PokemonCardProps) {
+export const PokemonCard = memo(function PokemonCard({ id, name, types, onClick, isSelected }) {
   const primaryType = types[0]?.type.name || 'normal';
   const bgColor = typeColors[primaryType] || typeColors.normal;
+  const hasMega = MEGA_EVOLVABLE_IDS.has(id);
+  const hasGmax = GMAX_CAPABLE_IDS.has(id);
 
   return (
     <button
@@ -29,6 +23,20 @@ export const PokemonCard = memo(function PokemonCard({ id, name, types, onClick,
         boxShadow: `0 4px 16px ${bgColor}50`
       }}
     >
+      {/* Mega/Gmax Badges */}
+      <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+        {hasMega && (
+          <span className="px-1.5 py-0.5 rounded-md bg-red-500 text-white text-[8px] font-black leading-none shadow-sm border border-white/20 animate-pulse">
+            MEGA
+          </span>
+        )}
+        {hasGmax && (
+          <span className="px-1.5 py-0.5 rounded-md bg-purple-500 text-white text-[8px] font-black leading-none shadow-sm border border-white/20">
+            GMAX
+          </span>
+        )}
+      </div>
+
       {/* Pokeball Background Pattern */}
       <div className="absolute inset-0 overflow-hidden rounded-2xl opacity-10 pointer-events-none">
         <svg 

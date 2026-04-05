@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, memo } from 'react';
 import Image from 'next/image';
 import { Swords, Shield, Search, X, Zap, Ban } from 'lucide-react';
 import {
-  Pokemon,
   fetchPokemon,
   fetchPokemonList,
   typeColors,
@@ -15,16 +14,11 @@ import {
   POKEMON_LIMIT
 } from '@/lib/pokemon-api';
 
-interface TypeRelation {
-  type: string;
-  multiplier: number;
-}
-
 export const TypeMatchupTool = memo(function TypeMatchupTool() {
-  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
+  const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<{ name: string; id: number }[]>([]);
-  const [allPokemon, setAllPokemon] = useState<{ name: string; id: number }[]>([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [allPokemon, setAllPokemon] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -53,7 +47,7 @@ export const TypeMatchupTool = memo(function TypeMatchupTool() {
     setSearchResults(results);
   }, [searchQuery, allPokemon]);
 
-  const selectPokemon = useCallback(async (nameOrId: string | number) => {
+  const selectPokemon = useCallback(async (nameOrId) => {
     setLoading(true);
     setShowSearch(false);
     setSearchQuery('');
@@ -72,8 +66,8 @@ export const TypeMatchupTool = memo(function TypeMatchupTool() {
     if (!selectedPokemon) return { weaknesses: [], resistances: [], immunities: [], offensive: [] };
 
     const types = selectedPokemon.types.map(t => t.type.name);
-    const damageMultipliers: Record<string, number> = {};
-    const offensiveMultipliers: Record<string, number> = {};
+    const damageMultipliers = {};
+    const offensiveMultipliers = {};
 
     Object.keys(typeColors).forEach(type => {
       damageMultipliers[type] = 1;
@@ -97,10 +91,10 @@ export const TypeMatchupTool = memo(function TypeMatchupTool() {
       });
     });
 
-    const weaknesses: TypeRelation[] = [];
-    const resistances: TypeRelation[] = [];
-    const immunities: TypeRelation[] = [];
-    const offensive: TypeRelation[] = [];
+    const weaknesses = [];
+    const resistances = [];
+    const immunities = [];
+    const offensive = [];
 
     Object.entries(damageMultipliers).forEach(([type, multiplier]) => {
       if (multiplier === 0) {

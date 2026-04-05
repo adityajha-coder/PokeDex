@@ -4,9 +4,6 @@ import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
 import { X, Zap, Shield, Swords, Heart, Activity, Footprints, ChevronRight } from 'lucide-react';
 import { 
-  Pokemon, 
-  PokemonSpecies, 
-  EvolutionChain,
   fetchPokemonSpecies, 
   fetchEvolutionChain,
   fetchPokemon,
@@ -16,20 +13,12 @@ import {
   typeColors 
 } from '@/lib/pokemon-api';
 
-interface PokemonDetailProps {
-  pokemon: Pokemon;
-  onClose: () => void;
-}
-
-interface EvolutionInfo {
-  id: number;
-  name: string;
-}
-
-export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: PokemonDetailProps) {
-  const [species, setSpecies] = useState<PokemonSpecies | null>(null);
-  const [evolutionChain, setEvolutionChain] = useState<EvolutionInfo[]>([]);
+export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
+  const [species, setSpecies] = useState(null);
+  const [evolutionChain, setEvolutionChain] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activePokemon, setActivePokemon] = useState(pokemon);
+  const [varieties, setVarieties] = useState([]);
 
   useEffect(() => {
     async function loadSpeciesData() {
@@ -37,10 +26,28 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
         const speciesData = await fetchPokemonSpecies(pokemon.id);
         setSpecies(speciesData);
 
+        // Fetch varieties (Mega, Gmax, etc.)
+        const varietyData = await Promise.all(
+          speciesData.varieties
+            .filter(v => !v.is_default) // Only non-default varieties
+            .map(async (v) => {
+              const pokemonData = await fetchPokemon(v.pokemon.name);
+              return {
+                id: pokemonData.id,
+                name: v.pokemon.name,
+                data: pokemonData,
+                isMega: v.pokemon.name.includes('-mega'),
+                isGmax: v.pokemon.name.includes('-gmax'),
+                isRegional: v.pokemon.name.includes('-alola') || v.pokemon.name.includes('-galar') || v.pokemon.name.includes('-hisui') || v.pokemon.name.includes('-paldea')
+              };
+            })
+        );
+        setVarieties(varietyData);
+
         const chainData = await fetchEvolutionChain(speciesData.evolution_chain.url);
-        const evolutions: EvolutionInfo[] = [];
+        const evolutions = [];
         
-        const parseChain = async (node: EvolutionChain['chain']) => {
+        const parseChain = async (node) => {
           const pokemonData = await fetchPokemon(node.species.name);
           evolutions.push({ id: pokemonData.id, name: node.species.name });
           
@@ -61,7 +68,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
     loadSpeciesData();
   }, [pokemon.id]);
 
-  const primaryType = pokemon.types[0]?.type.name || 'normal';
+  const primaryType = activePokemon.types[0]?.type.name || 'normal';
   
   const description = species?.flavor_text_entries
     .find(entry => entry.language.name === 'en')
@@ -72,8 +79,8 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
     ?.genus || 'Unknown';
 
   // Get weakness from type
-  const getWeakness = (type: string) => {
-    const weaknesses: Record<string, string[]> = {
+  const getWeakness = (type) => {
+    const weaknesses = {
       electric: ['Ground'],
       fire: ['Water', 'Ground', 'Rock'],
       water: ['Electric', 'Grass'],
@@ -96,7 +103,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
     return weaknesses[type] || ['Unknown'];
   };
 
-  const statIcons: Record<string, React.ReactNode> = {
+  const statIcons = {
     hp: <Heart size={14} />,
     attack: <Swords size={14} />,
     defense: <Shield size={14} />,
@@ -105,7 +112,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
     speed: <Footprints size={14} />,
   };
 
-  const statLabels: Record<string, string> = {
+  const statLabels = {
     hp: 'HP',
     attack: 'ATK',
     defense: 'DEF',
@@ -149,7 +156,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
               <p className="text-[#1E3A5F]/40 text-[10px] font-black tracking-[0.3em] uppercase mb-1">DETAILED ANALYSIS</p>
               <div className="flex items-center gap-4">
                 <h2 className="text-5xl md:text-6xl pokemon-logo pt-2 uppercase">
-                  {pokemon.name}
+                  {activePokemon.name}
                 </h2>
               </div>
             </div>
@@ -178,11 +185,66 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
                 {loading ? 'Decrypting species data...' : description}
               </p>
 
+              {/* Signature Forms Section */}
+              {varieties.length > 0 && (
+                <div className="space-y-3 mt-4">
+                  <p className="text-[#1E3A5F]/40 text-[10px] font-black tracking-[0.3em] uppercase">Master Forms</p>
+                  <div className="flex flex-wrap gap-3">
+                    {/* Default Form */}
+                    <button
+                      onClick={() => setActivePokemon(pokemon)}
+                      className={`relative w-14 h-14 rounded-2xl overflow-hidden border-2 transition-all group ${
+                        activePokemon.id === pokemon.id 
+                          ? 'border-[#1E3A5F] bg-white shadow-lg scale-110' 
+                          : 'border-[#1E3A5F]/20 bg-white/50 hover:border-[#1E3A5F]'
+                      }`}
+                    >
+                      <Image
+                        src={getOfficialArtwork(pokemon.id)}
+                        alt="Default"
+                        fill
+                        className="object-contain p-1"
+                      />
+                      {activePokemon.id === pokemon.id && (
+                        <div className="absolute inset-x-0 bottom-0 bg-[#1E3A5F] text-white text-[8px] font-bold text-center py-0.5">
+                          BASE
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Other Varieties */}
+                    {varieties.map((variety) => (
+                      <button
+                        key={variety.id}
+                        onClick={() => setActivePokemon(variety.data)}
+                        className={`relative w-14 h-14 rounded-2xl overflow-hidden border-2 transition-all group ${
+                          activePokemon.id === variety.id 
+                            ? 'border-[#1E3A5F] bg-white shadow-lg scale-110' 
+                            : 'border-[#1E3A5F]/20 bg-white/50 hover:border-[#1E3A5F]'
+                        }`}
+                      >
+                        <Image
+                          src={getOfficialArtwork(variety.id)}
+                          alt={variety.name}
+                          fill
+                          className="object-contain p-1"
+                        />
+                        <div className={`absolute inset-x-0 bottom-0 text-white text-[8px] font-bold text-center py-0.5 ${
+                          variety.isMega ? 'bg-[#EF4444]' : variety.isGmax ? 'bg-[#A855F7]' : 'bg-[#1E3A5F]'
+                        }`}>
+                          {variety.isMega ? 'MEGA' : variety.isGmax ? 'GMAX' : 'FORM'}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Moves Section */}
               <div className="space-y-3">
                 <p className="text-[#1E3A5F]/40 text-[10px] font-black tracking-[0.3em] uppercase">Signature Moves</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {pokemon.moves.slice(0, 6).map(({ move }) => (
+                  {activePokemon.moves.slice(0, 6).map(({ move }) => (
                     <div 
                       key={move.name}
                       className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#1E3A5F]/10 border border-[#1E3A5F]/20 group hover:bg-[#1E3A5F] transition-all"
@@ -204,7 +266,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
                 <Activity size={16} className="text-[#1E3A5F]/30" />
               </div>
               <div className="grid grid-cols-1 gap-3">
-                {pokemon.stats.map(({ stat, base_stat }) => (
+                {activePokemon.stats.map(({ stat, base_stat }) => (
                   <div key={stat.name} className="flex flex-col gap-1">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-[#1E3A5F]">
@@ -217,7 +279,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
                       <div 
                         className="h-full rounded-full transition-all duration-700 ease-out"
                         style={{ 
-                          width: `${Math.min(100, (base_stat / 150) * 100)}%`,
+                          width: `${Math.min(100, (base_stat / 160) * 100)}%`,
                           backgroundColor: base_stat > 110 ? '#22c55e' : base_stat > 70 ? '#2563eb' : '#ef4444'
                         }}
                       />
@@ -234,17 +296,17 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
           <div className="flex flex-col items-center justify-center relative">
             {/* Height & Weight indicators */}
             <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col items-start gap-1 text-[#1E3A5F]/60 text-xs">
-              <span>Height: {(pokemon.height / 10).toFixed(1)}m</span>
+              <span>Height: {(activePokemon.height / 10).toFixed(1)}m</span>
             </div>
             <div className="absolute bottom-20 right-0 text-[#1E3A5F]/60 text-xs">
-              Weight: {(pokemon.weight / 10).toFixed(1)}kg
+              Weight: {(activePokemon.weight / 10).toFixed(1)}kg
             </div>
 
             {/* Main Pokemon Image */}
             <div className="relative w-64 h-64 md:w-80 md:h-80 animate-float">
               <Image
-                src={getOfficialArtwork(pokemon.id)}
-                alt={pokemon.name}
+                src={getOfficialArtwork(activePokemon.id)}
+                alt={activePokemon.name}
                 fill
                 className="object-contain drop-shadow-2xl"
                 priority
@@ -276,16 +338,16 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
 
             {/* Page Indicator */}
             <div className="flex items-center gap-2 mt-6 text-[#1E3A5F]/40 text-sm">
-              <span className="font-bold text-[#1E3A5F]">{formatPokemonId(pokemon.id).replace('#', '')}</span>
+              <span className="font-bold text-[#1E3A5F]">{formatPokemonId(activePokemon.id).replace('#', '')}</span>
               <div className="w-12 h-0.5 bg-[#1E3A5F]/20" />
-              <span>151</span>
+              <span>1025</span>
             </div>
           </div>
         </div>
 
         {/* Types Bar */}
         <div className="flex justify-center gap-3 pb-6">
-          {pokemon.types.map(({ type }) => (
+          {activePokemon.types.map(({ type }) => (
             <span
               key={type.name}
               className="px-5 py-2 rounded-full text-sm font-bold text-white shadow-lg"

@@ -1,25 +1,33 @@
 {
-  "name": "PokeDex",
+  "name": "PokeDex Master",
   "short_name": "PokeDex",
-  "description": "Complete Pokemon database with all generations - type matchups, and evolution tracking",
+  "description": "The ultimate digital world encyclopedia for all Pokemon species, evolutions, and tactical analysis.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#2563EB",
+  "background_color": "#1E3A5F",
   "theme_color": "#FACC15",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/favicon.jpg",
-      "sizes": "192x192",
-      "type": "image/jpeg",
-      "purpose": "maskable any"
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
     {
-      "src": "/favicon.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "maskable any"
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     }
   ],
-  "categories": ["games", "entertainment"]
+  "categories": ["games", "utilities", "entertainment"],
+  "screenshots": [
+    {
+      "src": "/placeholder.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "PokeDex Dashboard"
+    }
+  ]
 }

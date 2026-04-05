@@ -3,13 +3,7 @@
 import { useState, useCallback, useEffect, memo } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 
-interface SearchBarProps {
-  onSearch: (query: string) => void;
-  isLoading?: boolean;
-  placeholder?: string;
-}
-
-export const SearchBar = memo(function SearchBar({ onSearch, isLoading, placeholder = 'Search Pokemon by name or ID...' }: SearchBarProps) {
+export const SearchBar = memo(function SearchBar({ onSearch, isLoading, placeholder = 'Search Pokemon by name or ID...' }) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
 

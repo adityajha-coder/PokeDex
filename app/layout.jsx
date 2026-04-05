@@ -1,4 +1,3 @@
-import type { Metadata, Viewport } from 'next'
 import { Poppins, Luckiest_Guy } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
@@ -16,7 +15,7 @@ const pokemonFont = Luckiest_Guy({
   variable: '--font-pokemon',
 })
 
-export const viewport: Viewport = {
+export const viewport = {
   themeColor: '#FACC15',
   width: 'device-width',
   initialScale: 1,
@@ -24,7 +23,7 @@ export const viewport: Viewport = {
   userScalable: true,
 }
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'PokeDex | Complete Pokemon Database',
   description: 'PokeDex - Your ultimate Pokemon database with all generations, type matchup calculator, and evolution tracker. Gotta catch em all!',
   generator: 'v0.app',
@@ -47,11 +46,9 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+import { Toaster } from '@/components/ui/toaster'
+
+export default function RootLayout({ children }) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <head>
@@ -61,18 +58,35 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className={`${poppins.variable} ${pokemonFont.variable} font-sans antialiased`}>
+      <body className={`${poppins.variable} ${pokemonFont.variable} font-sans antialiased text-white`}>
         {children}
+        <Toaster />
         <Script id="service-worker" strategy="afterInteractive">
           {`
             if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.register('/sw.js')
-                .then((registration) => {
-                  console.log('SW registered:', registration);
-                })
-                .catch((error) => {
-                  console.log('SW registration failed:', error);
-                });
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                  .then((registration) => {
+                    console.log('SW registered:', registration);
+                    registration.onupdatefound = () => {
+                      const installingWorker = registration.installing;
+                      if (installingWorker) {
+                        installingWorker.onstatechange = () => {
+                          if (installingWorker.state === 'installed') {
+                            if (navigator.serviceWorker.controller) {
+                              console.log('New content available; please refresh.');
+                            } else {
+                              console.log('Content is cached for offline use.');
+                            }
+                          }
+                        };
+                      }
+                    };
+                  })
+                  .catch((error) => {
+                    console.log('SW registration failed:', error);
+                  });
+              });
             }
           `}
         </Script>
