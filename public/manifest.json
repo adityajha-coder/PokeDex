@@ -1,6 +1,6 @@
 {
-  "name": "PokeDex Master",
-  "short_name": "PokeDex",
+  "name": "POKEDEX DB",
+  "short_name": "POKEDEX",
   "description": "The ultimate digital world encyclopedia for all Pokemon species, evolutions, and tactical analysis.",
   "start_url": "/",
   "display": "standalone",
@@ -13,21 +13,11 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
-    },
-    {
-      "src": "/apple-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
     }
   ],
-  "categories": ["games", "utilities", "entertainment"],
-  "screenshots": [
-    {
-      "src": "/placeholder.jpg",
-      "sizes": "1280x720",
-      "type": "image/jpeg",
-      "form_factor": "wide",
-      "label": "PokeDex Dashboard"
-    }
+  "categories": [
+    "games",
+    "utilities",
+    "entertainment"
   ]
 }

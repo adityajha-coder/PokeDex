@@ -35,14 +35,16 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   // Handle PokeAPI requests with network-first strategy
-  if (url.hostname === 'pokeapi.co') {
+  if (url.hostname === 'pokeapi.co' && request.method === 'GET') {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const clonedResponse = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, clonedResponse);
-          });
+          if (response.ok) {
+            const clonedResponse = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, clonedResponse);
+            });
+          }
           return response;
         })
         .catch(() => caches.match(request))
@@ -51,17 +53,19 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Handle image requests from Pokemon sprites
-  if (url.hostname === 'raw.githubusercontent.com') {
+  if (url.hostname === 'raw.githubusercontent.com' && request.method === 'GET') {
     event.respondWith(
       caches.match(request).then((cachedResponse) => {
         if (cachedResponse) {
           return cachedResponse;
         }
         return fetch(request).then((response) => {
-          const clonedResponse = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, clonedResponse);
-          });
+          if (response.ok) {
+            const clonedResponse = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, clonedResponse);
+            });
+          }
           return response;
         });
       })
@@ -70,15 +74,23 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Stale-while-revalidate for static assets
-  event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      const fetchPromise = fetch(request).then((networkResponse) => {
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(request, networkResponse.clone());
+  if (url.protocol === 'http:' || url.protocol === 'https:') {
+    event.respondWith(
+      caches.match(request).then((cachedResponse) => {
+        const fetchPromise = fetch(request).then((networkResponse) => {
+          if (request.method === 'GET' && networkResponse.ok) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseToCache);
+            });
+          }
+          return networkResponse;
+        }).catch(() => {
+          // If network fails, just return the cachedResponse
+          return cachedResponse;
         });
-        return networkResponse;
-      });
-      return cachedResponse || fetchPromise;
-    })
-  );
+        return cachedResponse || fetchPromise;
+      })
+    );
+  }
 });

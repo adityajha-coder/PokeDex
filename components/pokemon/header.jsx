@@ -25,11 +25,8 @@ export function Header() {
             className="drop-shadow-lg group-hover:scale-110 transition-transform duration-200"
             priority
           />
-          <span
-            className="text-2xl font-extrabold text-[#FACC15] tracking-tight"
-            style={{ textShadow: '2px 2px 0 #1E3A5F' }}
-          >
-            PokeDex
+          <span className="text-2xl pokemon-logo">
+            POKEDEX
           </span>
         </Link>
 
