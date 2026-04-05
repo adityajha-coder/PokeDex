@@ -6,10 +6,31 @@ export interface Pokemon {
   types: PokemonType[];
   abilities: Ability[];
   stats: Stat[];
+  moves: PokemonMove[];
   height: number;
   weight: number;
   sprites: Sprites;
   species: { url: string };
+}
+
+export interface PokemonMove {
+  move: {
+    name: string;
+    url: string;
+  };
+  version_group_details: MoveVersionGroupDetail[];
+}
+
+export interface MoveVersionGroupDetail {
+  level_learned_at: number;
+  move_learn_method: {
+    name: string;
+    url: string;
+  };
+  version_group: {
+    name: string;
+    url: string;
+  };
 }
 
 export interface PokemonType {

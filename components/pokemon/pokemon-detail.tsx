@@ -145,13 +145,12 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
           {/* Left Column - Info */}
           <div className="flex flex-col">
             {/* Name Section */}
-            <div className="mb-4">
-              <p className="text-[#1E3A5F]/50 text-xs font-semibold tracking-widest mb-1">NAME</p>
-              <div className="flex items-center gap-3">
-                <h2 className="text-4xl md:text-5xl font-extrabold text-[#1E3A5F] uppercase tracking-tight">
-                  {capitalize(pokemon.name)}
+            <div className="mb-6">
+              <p className="text-[#1E3A5F]/40 text-[10px] font-black tracking-[0.3em] uppercase mb-1">DETAILED ANALYSIS</p>
+              <div className="flex items-center gap-4">
+                <h2 className="text-5xl md:text-6xl pokemon-logo pt-2 uppercase">
+                  {pokemon.name}
                 </h2>
-                <div className="h-1 w-8 bg-[#1E3A5F]" />
               </div>
             </div>
 
@@ -174,30 +173,55 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }: P
             </div>
 
             {/* Description */}
-            <p className="text-[#1E3A5F]/80 text-sm leading-relaxed mb-6 max-w-md">
-              {loading ? 'Loading description...' : description}
-            </p>
+            <div className="space-y-4 mb-6">
+              <p className="text-[#1E3A5F] text-sm font-bold leading-relaxed max-w-md">
+                {loading ? 'Decrypting species data...' : description}
+              </p>
+
+              {/* Moves Section */}
+              <div className="space-y-3">
+                <p className="text-[#1E3A5F]/40 text-[10px] font-black tracking-[0.3em] uppercase">Signature Moves</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {pokemon.moves.slice(0, 6).map(({ move }) => (
+                    <div 
+                      key={move.name}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#1E3A5F]/10 border border-[#1E3A5F]/20 group hover:bg-[#1E3A5F] transition-all"
+                    >
+                      <Zap size={14} className="text-[#1E3A5F] group-hover:text-white" />
+                      <span className="text-[10px] font-black text-[#1E3A5F] uppercase tracking-wider group-hover:text-white">
+                        {capitalize(move.name)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             {/* Stats */}
-            <div className="bg-[#1E3A5F]/5 rounded-2xl p-4 mb-4">
-              <h3 className="text-[#1E3A5F] font-bold mb-3 text-sm">Base Stats</h3>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="bg-[#1E3A5F]/5 backdrop-blur-sm rounded-3xl p-6 border border-[#1E3A5F]/10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-[#1E3A5F] font-black uppercase text-xs tracking-widest">Combat Capabilities</h3>
+                <Activity size={16} className="text-[#1E3A5F]/30" />
+              </div>
+              <div className="grid grid-cols-1 gap-3">
                 {pokemon.stats.map(({ stat, base_stat }) => (
-                  <div key={stat.name} className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 w-20 text-[#1E3A5F]/70">
-                      {statIcons[stat.name]}
-                      <span className="text-xs font-medium">{statLabels[stat.name]}</span>
+                  <div key={stat.name} className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-[#1E3A5F]">
+                        {statIcons[stat.name]}
+                        <span className="text-[10px] font-black uppercase tracking-wider">{statLabels[stat.name]}</span>
+                      </div>
+                      <span className="text-[#1E3A5F] font-black text-xs">{base_stat}</span>
                     </div>
-                    <div className="flex-1 bg-[#1E3A5F]/10 rounded-full h-2 overflow-hidden">
+                    <div className="flex-1 bg-[#1E3A5F]/10 rounded-full h-2.5 overflow-hidden border border-[#1E3A5F]/5">
                       <div 
-                        className="h-full rounded-full transition-all duration-500"
+                        className="h-full rounded-full transition-all duration-700 ease-out"
                         style={{ 
                           width: `${Math.min(100, (base_stat / 150) * 100)}%`,
-                          backgroundColor: base_stat > 100 ? '#22c55e' : base_stat > 50 ? '#1E3A5F' : '#ef4444'
+                          backgroundColor: base_stat > 110 ? '#22c55e' : base_stat > 70 ? '#2563eb' : '#ef4444'
                         }}
                       />
                     </div>
-                    <span className="w-8 text-[#1E3A5F] font-bold text-xs">{base_stat}</span>
                   </div>
                 ))}
               </div>
