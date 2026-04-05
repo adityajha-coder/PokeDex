@@ -1,72 +1,110 @@
-# PokéDex-DB 🔴⚪
+<p align="center">
+  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" width="120" alt="Pikachu" />
+</p>
 
-[![Pokémon](https://img.shields.io/badge/Pokémon-database-red?style=for-the-badge&logo=pokemon)](https://pokeapi.co/)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.2-blue?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+# <p align="center">PokéDex-DB 🔴⚪</p>
 
-A modern, high-performance PokéDex built with Next.js, featuring a nostalgic design inspired by the classic handhelds we grew up with.
+<p align="center">
+  <i>The ultimate digital world encyclopedia for all Pokémon species, evolutions, and tactical analysis.</i>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4.x-blue?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/PokeAPI-REST-red?style=for-the-badge&logo=pokemon" alt="PokeAPI" />
+  <img src="https://img.shields.io/badge/Status-Perfect-green?style=for-the-badge" alt="Status" />
+</p>
 
 ---
 
-## 📸 Preview
+## 📸 Overview
 
-> [!TIP]
-> This PokéDex is designed to feel like the classic Pokédex from the 90s but with modern speed and features.
+A modern, high-performance PokéDex built with **Next.js**, featuring a nostalgic design inspired by the classic handhelds we grew up with. It's not just a database; it's a trainer's essential companion.
+
+> [!IMPORTANT]
+> **PokéDex-DB** leverages the Power of the **PokeAPI** to provide real-time data for over **1025+ Pokémon** across all generations.
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-- **🔴 Comprehensive Database**: Generation 1-9 coverage (1025+ Pokémon).
-- **⚪ Evolution Tracking**: Interactive evolution chains with detailed requirements.
-- **🔵 Type Matchup Tool**: Calculate strengths and weaknesses on the fly.
-- **🟢 Search & Filter**: Find your favorite Pokémon by name, ID, or type.
-- **🟡 Responsive Design**: Glassmorphic UI that feels premium and alive.
+| Category | Description | Emoji |
+| :--- | :--- | :---: |
+| **Comprehensive DB** | Data from Generation 1 to 9, including stats and moves. | 🟢 |
+| **Evolution Chains** | Detailed requirements for every evolution branch. | ⚪ |
+| **Type Matchups** | Instant calculations for offensive/defensive strategy. | 🔵 |
+| **Smart Search** | Fuzzy search by name, ID, or elemental type. | 🟠 |
+| **Premium UI** | Glassmorphic, responsive, and buttery-smooth design. | 🔴 |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org/) (App Router & RSC)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **State Management**: React Hooks (useState, useEffect, useMemo)
+- **API**: [PokeAPI](https://pokeapi.co/)
+- **Components**: [Radix UI](https://www.radix-ui.com/) & [Lucide Icons](https://lucide.dev/)
 
 ---
 
 ## 🚀 Quick Start
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/adityajha-coder/PokeDex-DB.git
-   ```
+### 1. Prerequisite
+Ensure you have [Node.js](https://nodejs.org/) installed on your machine.
 
-2. **Set up Environment Variables**:
-   Copy `.env.example` to `.env.local` and configure your API URL.
-   ```bash
-   cp .env.example .env.local
-   ```
+### 2. Setup
+```bash
+# Clone the repository
+git clone https://github.com/adityajha-coder/PokeDex-DB.git
 
-3. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+# Navigate into the project
+cd PokeDex-DB
 
-4. **Run the development server**:
-   ```bash
-   npm run dev
-   ```
+# Install dependencies
+npm install
+```
+
+### 3. Environment Variables
+Copy `.env.example` to `.env.local` to configure your environment.
+```bash
+cp .env.example .env.local
+```
+
+### 4. Run Development
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to start your adventure!
 
 ---
 
-## 🛠️ Built With
+## 📁 Project Structure
 
-- **Next.js** - The React Framework for the Web
-- **PokeAPI** - The RESTful Pokémon API
-- **Radix UI** - Primitive components for high-quality design systems
-- **Lucide Icons** - Beautiful & consistent icons
+```text
+.
+├── 📂 app            # Next.js App Router (Pages & Layouts)
+├── 📂 components     # Reusable UI components
+│   ├── 📂 pokemon    # Pokemon-specific logic
+│   └── 📂 ui         # Shadcn/Radix UI primitives
+├── 📂 hooks          # Custom React hooks
+├── 📂 lib            # Shared utilities & API functions
+├── 📂 public         # Static assets (icons, manifest)
+└── 📂 styles         # Global CSS & Tailwind configuration
+```
 
 ---
 
 ## 📖 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+This project is open-source and available under the **MIT License**.
 
 ---
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" width="150" alt="Pikachu" />
-  <br />
-  <i>"To catch them is my real test, to train them is my cause!"</i> 🧢⚡
+  <i>"To catch them is my real test, to train them is my cause!"</i> 🧢⚡️
+</p>
+
+<p align="center">
+  <b>Built with ❤️ for Trainers everywhere.</b>
 </p>
