@@ -194,6 +194,11 @@ export const Pokedex = memo(function Pokedex() {
       if (genData) {
         filtered = filtered.filter(p => p.id >= genData.start && p.id <= genData.end);
       }
+    } else if (selectedGen === 0 && !searchQuery && !selectedType && !showLegendariesOnly) {
+      if (allPokemonBasic.length > 0) {
+        const visibleIds = new Set(allPokemonBasic.slice(0, visibleCount).map(p => p.id));
+        filtered = filtered.filter(p => visibleIds.has(p.id));
+      }
     }
 
     if (searchQuery) {

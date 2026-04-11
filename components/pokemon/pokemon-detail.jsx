@@ -194,8 +194,8 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                     <button
                       onClick={() => setActivePokemon(pokemon)}
                       className={`relative w-14 h-14 rounded-2xl overflow-hidden border-2 transition-all group ${activePokemon.id === pokemon.id
-                          ? 'border-[#1E3A5F] bg-white shadow-lg scale-110'
-                          : 'border-[#1E3A5F]/20 bg-white/50 hover:border-[#1E3A5F]'
+                        ? 'border-[#1E3A5F] bg-white shadow-lg scale-110'
+                        : 'border-[#1E3A5F]/20 bg-white/50 hover:border-[#1E3A5F]'
                         }`}
                     >
                       <Image
@@ -217,8 +217,8 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                         key={variety.id}
                         onClick={() => setActivePokemon(variety.data)}
                         className={`relative w-14 h-14 rounded-2xl overflow-hidden border-2 transition-all group ${activePokemon.id === variety.id
-                            ? 'border-[#1E3A5F] bg-white shadow-lg scale-110'
-                            : 'border-[#1E3A5F]/20 bg-white/50 hover:border-[#1E3A5F]'
+                          ? 'border-[#1E3A5F] bg-white shadow-lg scale-110'
+                          : 'border-[#1E3A5F]/20 bg-white/50 hover:border-[#1E3A5F]'
                           }`}
                       >
                         <Image
@@ -324,8 +324,8 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                   <div
                     key={evo.id}
                     className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${evo.id === pokemon.id
-                        ? 'border-[#1E3A5F] bg-white shadow-lg scale-110'
-                        : 'border-[#1E3A5F]/20 bg-white/50'
+                      ? 'border-[#1E3A5F] bg-white shadow-lg scale-110'
+                      : 'border-[#1E3A5F]/20 bg-white/50'
                       }`}
                   >
                     <Image
