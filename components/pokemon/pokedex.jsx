@@ -16,24 +16,12 @@ import { LoadingSpinner, GridSkeleton } from './loading-spinner';
 import { ChevronDown, Filter, Crown } from 'lucide-react';
 
 const LEGENDARY_IDS = new Set([
-  // Gen 1
-  144, 145, 146, 150, 151,
-  // Gen 2
-  243, 244, 245, 249, 250, 251,
-  // Gen 3
-  377, 378, 379, 380, 381, 382, 383, 384, 385, 386,
-  // Gen 4
-  480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493,
-  // Gen 5
-  494, 638, 639, 640, 641, 642, 643, 644, 645, 646, 647, 648, 649,
-  // Gen 6
-  716, 717, 718, 719, 720, 721,
-  // Gen 7
-  772, 773, 785, 786, 787, 788, 789, 790, 791, 792, 793, 794, 795, 796, 797, 798, 799, 800, 801, 802, 803, 804, 805, 806, 807, 808, 809,
-  // Gen 8
-  888, 889, 890, 891, 892, 893, 894, 895, 896, 897, 898, 905,
-  // Gen 9
-  1001, 1002, 1003, 1004, 1007, 1008, 1010, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025
+  144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386,
+  480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 494, 638, 639, 640, 641, 642, 643,
+  644, 645, 646, 647, 648, 649, 716, 717, 718, 719, 720, 721, 772, 773, 785, 786, 787, 788, 789, 790, 791,
+  792, 793, 794, 795, 796, 797, 798, 799, 800, 801, 802, 803, 804, 805, 806, 807, 808, 809, 888, 889, 890,
+  891, 892, 893, 894, 895, 896, 897, 898, 905, 1001, 1002, 1003, 1004, 1007, 1008, 1010, 1014, 1015, 1016,
+  1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025
 ]);
 
 const POKEMON_TYPES = Object.keys(typeColors);
@@ -41,10 +29,9 @@ const TOTAL_POKEMON = POKEMON_LIMIT;
 const INITIAL_LOAD = 50;
 const BATCH_SIZE = 50;
 
-// Cache for Pokemon data - persists across renders
+// Cache avoids refetching across renders
 const pokemonCache = new Map();
 
-// Memoized Pokemon Card wrapper
 const MemoizedPokemonCard = memo(PokemonCard);
 
 export const Pokedex = memo(function Pokedex() {
@@ -62,7 +49,6 @@ export const Pokedex = memo(function Pokedex() {
   const observerRef = useRef(null);
   const loadMoreRef = useRef(null);
 
-  // Generation ranges
   const generations = useMemo(() => [
     { gen: 0, name: 'All', start: 1, end: TOTAL_POKEMON },
     { gen: 1, name: 'Gen 1 (Kanto)', start: 1, end: 151 },
@@ -76,7 +62,7 @@ export const Pokedex = memo(function Pokedex() {
     { gen: 9, name: 'Gen 9 (Paldea)', start: 906, end: 1025 },
   ], []);
 
-  // Load all Pokemon basic info at once (just names and IDs - very fast)
+  // Initial load: grab names/IDs fast, then load the first batch
   useEffect(() => {
     async function loadAllPokemonBasic() {
       try {
@@ -87,7 +73,6 @@ export const Pokedex = memo(function Pokedex() {
         }));
         setAllPokemonBasic(basicList);
 
-        // Load first batch of full Pokemon data
         await loadPokemonBatch(basicList.slice(0, INITIAL_LOAD));
       } catch (error) {
         console.error('Failed to load Pokemon:', error);
@@ -113,7 +98,7 @@ export const Pokedex = memo(function Pokedex() {
       return;
     }
 
-    // Load in parallel with Promise.allSettled for better error handling
+    // Load whatever isn't cached yet
     const results = await Promise.allSettled(
       toLoad.map(p => fetchPokemon(p.id))
     );
@@ -133,7 +118,7 @@ export const Pokedex = memo(function Pokedex() {
     });
   }, []);
 
-  // Intersection Observer for infinite scroll
+  // Infinite scroll observer
   useEffect(() => {
     if (loading) return;
 

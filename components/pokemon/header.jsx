@@ -15,7 +15,6 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-[#1E3A5F]/80 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
       <nav className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Logo */}
         <Link href="/" prefetch={true} className="flex items-center gap-3 group">
           <Image
             src="/favicon.svg"
@@ -30,14 +29,12 @@ export function Header() {
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-1 bg-white/10 rounded-full p-1">
           <NavLink href="/" active={pathname === '/'}>Pokedex</NavLink>
           <NavLink href="/type-matchup" active={pathname === '/type-matchup'}>Type Matchup</NavLink>
           <NavLink href="/squad" active={pathname === '/squad'}>My Squad</NavLink>
         </div>
 
-        {/* Mobile Menu Button */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="md:hidden p-2 rounded-xl bg-[#FACC15] text-[#1E3A5F] hover:bg-yellow-400 transition-colors"
@@ -47,7 +44,6 @@ export function Header() {
         </button>
       </nav>
 
-      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-[#1E3A5F]/90 backdrop-blur-3xl border-t border-b border-white/10 animate-slide-up shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
           <div className="flex flex-col p-4 gap-2">

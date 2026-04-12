@@ -130,7 +130,6 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
         className="relative w-full max-w-5xl max-h-[90vh] overflow-auto rounded-3xl shadow-2xl animate-bounce-in pokemon-card-yellow"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 p-2 rounded-full bg-[#1E3A5F]/20 hover:bg-[#1E3A5F]/40 transition-colors text-[#1E3A5F]"
@@ -139,7 +138,6 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
           <X size={24} />
         </button>
 
-        {/* Background Pokeball watermark */}
         <div className="absolute right-10 top-1/2 -translate-y-1/2 w-80 h-80 opacity-5 pointer-events-none">
           <svg viewBox="0 0 100 100" className="w-full h-full">
             <circle cx="50" cy="50" r="48" fill="#1E3A5F" />
@@ -149,9 +147,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 p-6 md:p-8">
-          {/* Left Column - Info */}
           <div className="flex flex-col">
-            {/* Name Section */}
             <div className="mb-6">
               <p className="text-[#1E3A5F]/40 text-[10px] font-black tracking-[0.3em] uppercase mb-1">DETAILED ANALYSIS</p>
               <div className="flex items-center gap-4">
@@ -161,7 +157,6 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
               </div>
             </div>
 
-            {/* Info Pills */}
             <div className="mb-4">
               <p className="text-[#1E3A5F]/50 text-xs font-semibold tracking-widest mb-2">ABOUT</p>
               <div className="flex flex-col items-start gap-2">
@@ -210,13 +205,11 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
               </div>
             </div>
 
-            {/* Description */}
             <div className="space-y-4 mb-6">
               <p className="text-[#1E3A5F] text-sm font-bold leading-relaxed max-w-md">
                 {loading ? 'Decrypting species data...' : description}
               </p>
 
-              {/* Signature Forms Section */}
               {varieties.length > 0 && (
                 <div className="space-y-3 mt-4">
                   <p className="text-[#1E3A5F]/40 text-[10px] font-black tracking-[0.3em] uppercase">Master Forms</p>
@@ -268,7 +261,6 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                 </div>
               )}
 
-              {/* Moves Section */}
               <div className="space-y-3">
                 <p className="text-[#1E3A5F]/40 text-[10px] font-black tracking-[0.3em] uppercase">Signature Moves</p>
                 <div className="grid grid-cols-2 gap-3">
@@ -290,8 +282,6 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
               </div>
             </div>
 
-            {/* Stats */}
-            {/* Stats */}
             <div className="bg-[#FACC15] rounded-3xl p-6 shadow-md border border-white/20">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-[#1E3A5F] font-black uppercase text-xs tracking-widest">Combat Capabilities</h3>
@@ -344,11 +334,8 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                 })}
               </div>
             </div>
-
-
           </div>
 
-          {/* Right Column - Image & Evolution */}
           <div className="flex flex-col items-center justify-center relative">
             <div className="flex gap-4 mb-6">
               <div className="flex flex-col items-center px-4 py-2 bg-[#1E3A5F]/10 rounded-2xl border border-[#1E3A5F]/10">

@@ -152,14 +152,10 @@ function analyzeSquad(squad) {
   const hasSpecialWall = roles.some(r => r.specWall);
   const hasTank = roles.some(r => r.tank);
 
-  // ============================================
-  // COMPREHENSIVE SCORING SYSTEM (out of 100)
-  // ============================================
+  //Scoring System
   let score = 0;
 
   // --- 1. RAW POWER / BST (max 20 points) ---
-  // Competitive viable BST is typically 480+. Legendaries sit at 580-720.
-  // Score each member individually then average
   const bstScores = statTotals.map(bst => {
     if (bst >= 600) return 20;      // Pseudo-legendary / Legendary tier
     if (bst >= 530) return 17;      // Strong competitive (Garchomp, Gengar)
@@ -180,10 +176,8 @@ function analyzeSquad(squad) {
   const nonCritShared = sharedWeaknesses.filter(w => w.count < 3);
   typeSynergyScore -= nonCritShared.length * 1.5;
 
-  // Bonus for immunities (huge defensive advantage)
+  // Bonus for immunities and strong resistances
   typeSynergyScore += Math.min(6, immunities.length * 2);
-
-  // Bonus for strong resistances
   typeSynergyScore += Math.min(4, strongResistances.length * 0.8);
 
   // Bonus for type diversity
@@ -203,13 +197,10 @@ function analyzeSquad(squad) {
   score += Math.max(0, Math.min(25, typeSynergyScore));
 
   // --- 3. EVOLUTION STAGE (max 15 points) ---
-  // Use base_experience as a proxy: fully evolved Pokemon typically have 200+ base exp
-  // NFE (Not Fully Evolved) typically have <200
   const evoScores = squad.map(p => {
     const bst = p.stats.reduce((sum, s) => sum + s.base_stat, 0);
     const baseExp = p.base_experience || 0;
 
-    // Mega/Gmax forms have high base exp
     if (baseExp >= 300 || bst >= 600) return 15;   // Legendary/Mega tier
     if (baseExp >= 220 || bst >= 500) return 14;    // Fully evolved strong
     if (baseExp >= 170 || bst >= 450) return 12;    // Fully evolved standard
@@ -220,7 +211,6 @@ function analyzeSquad(squad) {
   score += evoScores.reduce((a, b) => a + b, 0) / squad.length;
 
   // --- 4. OFFENSIVE COVERAGE (max 15 points) ---
-  // How many of the 18 types can the team hit super-effectively via STAB?
   const coveragePercent = offensiveCoverage;
   if (coveragePercent >= 90) score += 15;
   else if (coveragePercent >= 75) score += 12;
@@ -253,23 +243,22 @@ function analyzeSquad(squad) {
   // --- 6. TEAM COMPOSITION (max 10 points) ---
   let compScore = 0;
 
-  // Full team bonus
   if (squad.length === 6) compScore += 5;
   else if (squad.length >= 4) compScore += 2;
   else compScore -= 2;
 
-  // Stat spread quality: team should have balanced total stats
+  // Stat spread quality
   const teamStatSums = { hp: 0, attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0 };
   squad.forEach(p => p.stats.forEach(s => { teamStatSums[s.stat.name] += s.base_stat; }));
   const statValues = Object.values(teamStatSums);
   const avgStatSum = statValues.reduce((a, b) => a + b, 0) / 6;
   const statVariance = statValues.reduce((sum, v) => sum + Math.pow(v - avgStatSum, 2), 0) / 6;
-  const statCV = Math.sqrt(statVariance) / avgStatSum; // Coefficient of variation
-  // Lower CV = more balanced. Competitive teams typically have CV < 0.3
-  if (statCV < 0.15) compScore += 5;       // Extremely balanced
-  else if (statCV < 0.25) compScore += 4;  // Well balanced
-  else if (statCV < 0.35) compScore += 2;  // Decent
-  else compScore += 0;                      // Lopsided
+  const statCV = Math.sqrt(statVariance) / avgStatSum; 
+  
+  if (statCV < 0.15) compScore += 5;       
+  else if (statCV < 0.25) compScore += 4;  
+  else if (statCV < 0.35) compScore += 2;  
+  else compScore += 0;                      
 
   score += Math.max(0, compScore);
 
