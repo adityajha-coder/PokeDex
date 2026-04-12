@@ -150,60 +150,225 @@ function analyzeSquad(squad) {
   const hasSpecialSweeper = roles.some(r => r.specSweeper);
   const hasPhysicalWall = roles.some(r => r.physWall);
   const hasSpecialWall = roles.some(r => r.specWall);
+  const hasTank = roles.some(r => r.tank);
 
-  // Score calculation (out of 100)
-  let score = 50; // base
+  // ============================================
+  // COMPREHENSIVE SCORING SYSTEM (out of 100)
+  // ============================================
+  let score = 0;
 
-  // BST bonus (max +15)
-  if (avgBST >= 600) score += 15;
-  else if (avgBST >= 540) score += 12;
-  else if (avgBST >= 480) score += 8;
-  else if (avgBST >= 420) score += 4;
+  // --- 1. RAW POWER / BST (max 20 points) ---
+  // Competitive viable BST is typically 480+. Legendaries sit at 580-720.
+  // Score each member individually then average
+  const bstScores = statTotals.map(bst => {
+    if (bst >= 600) return 20;      // Pseudo-legendary / Legendary tier
+    if (bst >= 530) return 17;      // Strong competitive (Garchomp, Gengar)
+    if (bst >= 480) return 14;      // Solid competitive (Toxapex, Clefable)
+    if (bst >= 420) return 10;      // Viable with niche (Azumarill, Quagsire)
+    if (bst >= 350) return 6;       // NFE / weak (Pikachu, Eviolite users)
+    return 3;                        // Very weak / unevolved
+  });
+  score += bstScores.reduce((a, b) => a + b, 0) / squad.length;
 
-  // Offensive coverage bonus (max +20)
-  score += (offensiveCoverage / 100) * 20;
+  // --- 2. TYPE SYNERGY (max 25 points) ---
+  let typeSynergyScore = 25;
 
-  // Type diversity bonus (max +10)
-  score += Math.min(10, (typeDiversity / 100) * 15);
+  // Penalty for critical weaknesses (3+ members weak to same type)
+  typeSynergyScore -= criticalWeaknesses.length * 6;
 
-  // Weakness penalties
-  score -= criticalWeaknesses.length * 5;
-  score -= sharedWeaknesses.length * 2;
+  // Penalty for shared weaknesses (2+ members)
+  const nonCritShared = sharedWeaknesses.filter(w => w.count < 3);
+  typeSynergyScore -= nonCritShared.length * 1.5;
 
-  // Immunity bonus
-  score += immunities.length * 3;
+  // Bonus for immunities (huge defensive advantage)
+  typeSynergyScore += Math.min(6, immunities.length * 2);
 
-  // Role balance bonus (max +10)
-  if (hasPhysicalSweeper) score += 2.5;
-  if (hasSpecialSweeper) score += 2.5;
-  if (hasPhysicalWall) score += 2.5;
-  if (hasSpecialWall) score += 2.5;
+  // Bonus for strong resistances
+  typeSynergyScore += Math.min(4, strongResistances.length * 0.8);
+
+  // Bonus for type diversity
+  if (typeDiversity >= 80) typeSynergyScore += 3;
+  else if (typeDiversity >= 60) typeSynergyScore += 2;
+  else if (typeDiversity >= 40) typeSynergyScore += 1;
+  else typeSynergyScore -= 2; // Penalty for very low diversity
+
+  // Type redundancy penalty
+  const typeCountMap = {};
+  squad.forEach(p => p.types.forEach(t => { typeCountMap[t.type.name] = (typeCountMap[t.type.name] || 0) + 1; }));
+  Object.values(typeCountMap).forEach(count => {
+    if (count >= 4) typeSynergyScore -= 4;
+    else if (count >= 3) typeSynergyScore -= 2;
+  });
+
+  score += Math.max(0, Math.min(25, typeSynergyScore));
+
+  // --- 3. EVOLUTION STAGE (max 15 points) ---
+  // Use base_experience as a proxy: fully evolved Pokemon typically have 200+ base exp
+  // NFE (Not Fully Evolved) typically have <200
+  const evoScores = squad.map(p => {
+    const bst = p.stats.reduce((sum, s) => sum + s.base_stat, 0);
+    const baseExp = p.base_experience || 0;
+
+    // Mega/Gmax forms have high base exp
+    if (baseExp >= 300 || bst >= 600) return 15;   // Legendary/Mega tier
+    if (baseExp >= 220 || bst >= 500) return 14;    // Fully evolved strong
+    if (baseExp >= 170 || bst >= 450) return 12;    // Fully evolved standard
+    if (baseExp >= 140 || bst >= 400) return 9;     // Mid-stage or weak final
+    if (baseExp >= 80 || bst >= 300) return 5;      // First evolution
+    return 2;                                         // Basic unevolved
+  });
+  score += evoScores.reduce((a, b) => a + b, 0) / squad.length;
+
+  // --- 4. OFFENSIVE COVERAGE (max 15 points) ---
+  // How many of the 18 types can the team hit super-effectively via STAB?
+  const coveragePercent = offensiveCoverage;
+  if (coveragePercent >= 90) score += 15;
+  else if (coveragePercent >= 75) score += 12;
+  else if (coveragePercent >= 60) score += 9;
+  else if (coveragePercent >= 40) score += 6;
+  else score += 3;
+
+  // --- 5. ROLE BALANCE (max 15 points) ---
+  let roleScore = 0;
+
+  // Offensive roles (max 6)
+  if (hasPhysicalSweeper && hasSpecialSweeper) roleScore += 6;  // Both attack types covered
+  else if (hasPhysicalSweeper || hasSpecialSweeper) roleScore += 3;
+
+  // Defensive roles (max 5)
+  if (hasPhysicalWall && hasSpecialWall) roleScore += 5;
+  else if (hasPhysicalWall || hasSpecialWall || hasTank) roleScore += 3;
+
+  // Speed control (max 4)
+  const speedValues = squad.map(p => p.stats.find(s => s.stat.name === 'speed')?.base_stat || 0);
+  const hasFast = speedValues.some(s => s >= 100);
+  const hasSlow = speedValues.some(s => s <= 50);
+  const hasModerate = speedValues.some(s => s >= 70 && s < 100);
+  if (hasFast && (hasModerate || hasSlow)) roleScore += 4;   // Good speed tiers
+  else if (hasFast) roleScore += 2;
+  else roleScore += 0; // No speed control
+
+  score += roleScore;
+
+  // --- 6. TEAM COMPOSITION (max 10 points) ---
+  let compScore = 0;
 
   // Full team bonus
-  if (squad.length === 6) score += 5;
-  else score -= (6 - squad.length) * 3;
+  if (squad.length === 6) compScore += 5;
+  else if (squad.length >= 4) compScore += 2;
+  else compScore -= 2;
+
+  // Stat spread quality: team should have balanced total stats
+  const teamStatSums = { hp: 0, attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0 };
+  squad.forEach(p => p.stats.forEach(s => { teamStatSums[s.stat.name] += s.base_stat; }));
+  const statValues = Object.values(teamStatSums);
+  const avgStatSum = statValues.reduce((a, b) => a + b, 0) / 6;
+  const statVariance = statValues.reduce((sum, v) => sum + Math.pow(v - avgStatSum, 2), 0) / 6;
+  const statCV = Math.sqrt(statVariance) / avgStatSum; // Coefficient of variation
+  // Lower CV = more balanced. Competitive teams typically have CV < 0.3
+  if (statCV < 0.15) compScore += 5;       // Extremely balanced
+  else if (statCV < 0.25) compScore += 4;  // Well balanced
+  else if (statCV < 0.35) compScore += 2;  // Decent
+  else compScore += 0;                      // Lopsided
+
+  score += Math.max(0, compScore);
 
   score = Math.max(0, Math.min(100, Math.round(score)));
 
-  // Suggestions
+  // Suggestions — prioritized by competitive impact
   const suggestions = [];
-  if (!hasPhysicalSweeper && !hasSpecialSweeper) {
-    suggestions.push({ icon: 'Swords', text: 'Add a fast sweeper (high Attack/Sp.Atk + Speed) for offensive pressure.' });
-  }
-  if (!hasPhysicalWall && !hasSpecialWall) {
-    suggestions.push({ icon: 'Shield', text: 'Add a defensive wall (high HP + Defense or Sp.Def) to absorb hits.' });
-  }
+
+  // 1. Critical weakness alerts (most important)
   if (criticalWeaknesses.length > 0) {
-    suggestions.push({ icon: 'AlertTriangle', text: `Critical weakness to ${criticalWeaknesses.map(capitalize).join(', ')}. Add a resist or immunity.` });
+    const weakTypes = criticalWeaknesses.map(capitalize).join(', ');
+    // Suggest specific types that resist these weaknesses
+    const counterSuggestions = {
+      ground: 'Flying or Levitate user',
+      ice: 'Fire, Steel, or Water type',
+      fire: 'Water, Rock, or Dragon type',
+      water: 'Water Absorb or Grass type',
+      electric: 'Ground type (immune)',
+      fairy: 'Steel or Poison type',
+      fighting: 'Ghost type (immune) or Psychic type',
+      rock: 'Steel or Fighting type',
+      dark: 'Fairy or Fighting type',
+      psychic: 'Dark type (immune) or Steel type',
+      ghost: 'Normal type (immune) or Dark type',
+      dragon: 'Fairy type (immune) or Steel type',
+      steel: 'Fire or Fighting type',
+      poison: 'Steel type (immune) or Ground type',
+      flying: 'Electric, Rock, or Steel type',
+      bug: 'Fire, Flying, or Rock type',
+      grass: 'Fire, Poison, or Flying type',
+      normal: 'Ghost type (immune) or Steel type',
+    };
+    const fixes = criticalWeaknesses.map(t => counterSuggestions[t]).filter(Boolean).slice(0, 2);
+    suggestions.push({ 
+      icon: 'AlertTriangle', 
+      text: `Critical team weakness to ${weakTypes}! ${fixes.length ? `Add a ${fixes.join(' or ')} to patch this.` : 'Add a resist or immunity.'}`
+    });
   }
-  if (missingCoverage.length > 4) {
-    suggestions.push({ icon: 'Zap', text: `Missing super-effective coverage against ${missingCoverage.slice(0, 3).map(capitalize).join(', ')} and more.` });
+
+  // 2. Speed tier analysis
+  const speedStats = squad.map(p => p.stats.find(s => s.stat.name === 'speed')?.base_stat || 0);
+  const fastMons = speedStats.filter(s => s >= 100).length;
+  const slowMons = speedStats.filter(s => s < 60).length;
+  if (fastMons === 0 && squad.length >= 2) {
+    suggestions.push({ icon: 'Zap', text: 'No fast Pokémon (100+ Speed). You risk being outsped by sweepers. Add a Speed threat like Greninja, Dragapult, or Weavile.' });
+  } else if (slowMons === squad.length && squad.length >= 3) {
+    suggestions.push({ icon: 'Zap', text: 'Entire team is slow (<60 Speed). Consider a Trick Room setter or add faster Pokémon for offensive pressure.' });
   }
+
+  // 3. Physical vs Special balance
+  const physAttackers = squad.filter(p => {
+    const atk = p.stats.find(s => s.stat.name === 'attack')?.base_stat || 0;
+    return atk >= 90;
+  }).length;
+  const specAttackers = squad.filter(p => {
+    const spa = p.stats.find(s => s.stat.name === 'special-attack')?.base_stat || 0;
+    return spa >= 90;
+  }).length;
+  if (physAttackers > 0 && specAttackers === 0 && squad.length >= 3) {
+    suggestions.push({ icon: 'Swords', text: 'All attackers are physical. Add a special attacker to break through physical walls like Skarmory or Ferrothorn.' });
+  } else if (specAttackers > 0 && physAttackers === 0 && squad.length >= 3) {
+    suggestions.push({ icon: 'Swords', text: 'All attackers are special. Add a physical attacker to pressure special walls like Blissey or Chansey.' });
+  }
+
+  // 4. Missing defensive roles
+  if (!hasPhysicalWall && !hasSpecialWall && squad.length >= 2) {
+    suggestions.push({ icon: 'Shield', text: 'No dedicated wall. Add a bulky Pokémon (high HP + Def/SpDef) like Toxapex, Ferrothorn, or Blissey to absorb hits.' });
+  } else if (hasPhysicalWall && !hasSpecialWall && squad.length >= 3) {
+    suggestions.push({ icon: 'Shield', text: 'No special wall. Your team struggles vs special attackers. Consider Blissey, Chansey, or Assault Vest users.' });
+  } else if (!hasPhysicalWall && hasSpecialWall && squad.length >= 3) {
+    suggestions.push({ icon: 'Shield', text: 'No physical wall. Physical sweepers will break through. Consider Skarmory, Ferrothorn, or Hippowdon.' });
+  }
+
+  // 5. Offensive coverage gaps (specific types)
+  if (missingCoverage.length > 0 && missingCoverage.length <= 6) {
+    suggestions.push({ icon: 'Zap', text: `Can't hit ${missingCoverage.map(capitalize).join(', ')} super-effectively. Add Pokémon with ${missingCoverage.slice(0,2).map(t => {
+      const counters = { normal: 'Fighting', fire: 'Water/Ground', water: 'Electric/Grass', electric: 'Ground', grass: 'Fire/Ice', ice: 'Fire/Fighting', fighting: 'Psychic/Flying', poison: 'Ground/Psychic', ground: 'Water/Grass', flying: 'Electric/Rock', psychic: 'Dark/Ghost', bug: 'Fire/Rock', rock: 'Water/Fighting', ghost: 'Dark/Ghost', dragon: 'Ice/Fairy', dark: 'Fighting/Fairy', steel: 'Fire/Fighting', fairy: 'Steel/Poison' };
+      return counters[t] || t;
+    }).join(' or ')} coverage.` });
+  } else if (missingCoverage.length > 6) {
+    suggestions.push({ icon: 'Zap', text: `Missing coverage against ${missingCoverage.length} types. Add Pokémon with diverse STAB typings like Dragon/Fairy, Ground/Ice, or Fire/Fighting.` });
+  }
+
+  // 6. Type redundancy check
+  const typeCount = {};
+  squad.forEach(p => p.types.forEach(t => { typeCount[t.type.name] = (typeCount[t.type.name] || 0) + 1; }));
+  const redundantTypes = Object.entries(typeCount).filter(([, count]) => count >= 3).map(([type]) => type);
+  if (redundantTypes.length > 0 && squad.length >= 4) {
+    suggestions.push({ icon: 'Star', text: `${redundantTypes.map(capitalize).join(', ')} type is overrepresented (${typeCount[redundantTypes[0]]}× members). This stacks shared weaknesses. Diversify your typings.` });
+  }
+
+  // 7. Incomplete team reminder
   if (squad.length < 6) {
-    suggestions.push({ icon: 'Plus', text: `Fill your remaining ${6 - squad.length} slot(s) to maximize team synergy.` });
+    suggestions.push({ icon: 'Plus', text: `Fill your remaining ${6 - squad.length} slot(s) to maximize team synergy and score.` });
   }
-  if (typeDiversity < 40 && squad.length >= 3) {
-    suggestions.push({ icon: 'Star', text: 'Low type diversity. Consider adding Pokemon with unique typings.' });
+
+  // 8. Low diversity warning
+  if (typeDiversity < 30 && squad.length >= 4) {
+    suggestions.push({ icon: 'Star', text: 'Very low type diversity. Your team shares too many types, making it predictable. Add unique typings like Steel/Fairy, Ghost/Dark, or Poison/Ground.' });
   }
 
   return {
@@ -226,7 +391,7 @@ function analyzeSquad(squad) {
 function getScoreColor(score) {
   if (score >= 95) return '#0EA5E9'; // Sky Blue
   if (score >= 80) return '#22C55E'; // Green
-  if (score >= 60) return '#FACC15'; // Yellow
+  if (score >= 60) return '#F97316'; // Orange (visible on yellow bg)
   return '#EF4444'; // Red
 }
 
@@ -308,40 +473,37 @@ function SquadCard({ pokemon, removeFromSquad }) {
         <div 
           className="absolute inset-0 w-full h-full rounded-3xl overflow-hidden pointer-events-auto flex flex-col"
           style={{ 
-            backgroundColor: '#0F172A', // Dark Slate matching theme
+            backgroundColor: '#FACC15',
             backfaceVisibility: 'hidden', 
             transform: 'rotateY(180deg)',
-            boxShadow: `0 15px 40px rgba(0,0,0,0.5), 0 0 0 2px ${bgColor}50 inset`
+            boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
           }}
         >
            {/* Header banner */}
-           <div className="h-12 w-full flex items-center justify-center border-b border-white/10 relative" style={{ backgroundColor: bgColor }}>
-              <div className="absolute inset-0 bg-black/20" />
-              <span className="relative text-white font-black text-[11px] uppercase tracking-[0.2em] drop-shadow-md">Combat Stats</span>
+           <div className="h-10 w-full flex items-center justify-center border-b border-[#1E3A5F]/10 relative bg-[#1E3A5F]">
+              <span className="relative text-[#FACC15] font-black text-[10px] uppercase tracking-[0.25em]">Combat Stats</span>
            </div>
            
-           <div className="flex-1 p-4 flex flex-col justify-center gap-3 bg-gradient-to-b from-[#1E3A5F] to-[#0f172a]">
+           <div className="flex-1 p-4 flex flex-col justify-center gap-2.5">
              {lv100Stats.map(s => (
-               <div key={s.name} className="flex items-center gap-3">
-                 <span className="text-white/50 text-[10px] font-black w-8 text-right uppercase tracking-wider">{STAT_LABELS[s.name]}</span>
-                 <div className="flex-1 h-2 bg-black/50 rounded-full overflow-hidden shadow-inner ring-1 ring-white/5">
+               <div key={s.name} className="flex items-center gap-2.5">
+                 <span className="text-[#1E3A5F]/50 text-[9px] font-black w-7 text-right uppercase tracking-wider">{STAT_LABELS[s.name]}</span>
+                 <div className="flex-1 h-1.5 bg-[#1E3A5F]/10 rounded-full overflow-hidden">
                    <div
-                     className="h-full rounded-full transition-all duration-700 relative"
+                     className="h-full rounded-full transition-all duration-700"
                      style={{
                        width: `${Math.min(100, (s.calc / 500) * 100)}%`,
-                       backgroundColor: s.calc >= 300 ? '#22c55e' : s.calc >= 200 ? '#FACC15' : '#ef4444'
+                       backgroundColor: s.calc >= 300 ? '#22c55e' : s.calc >= 200 ? '#3B82F6' : '#ef4444'
                      }}
-                   >
-                     <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent" />
-                   </div>
+                   />
                  </div>
-                 <span className="text-white font-black text-[11px] w-8">{s.calc}</span>
+                 <span className="text-[#1E3A5F] font-black text-[11px] w-7">{s.calc}</span>
                </div>
              ))}
              
-             <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center px-1">
-                <span className="text-white/40 text-[10px] font-black uppercase tracking-widest">Base Stats</span>
-                <span className="text-[#FACC15] text-[14px] font-black tracking-tighter drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">{bst}</span>
+             <div className="mt-3 pt-3 border-t border-[#1E3A5F]/10 flex justify-between items-center px-1">
+                <span className="text-[#1E3A5F]/40 text-[9px] font-black uppercase tracking-widest">Base Stats</span>
+                <span className="text-[#1E3A5F] text-[14px] font-black tracking-tighter">{bst}</span>
              </div>
            </div>
         </div>
@@ -356,6 +518,22 @@ export function SquadBuilder() {
   const [searchQuery, setSearchQuery] = useState('');
   const [allPokemon, setAllPokemon] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Load squad from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('pokefinder_squad');
+    if (saved) {
+      try {
+        const ids = JSON.parse(saved);
+        if (ids.length > 0) {
+          setLoading(true);
+          Promise.all(ids.map(id => fetchPokemon(id)))
+            .then(data => setSquad(data.filter(Boolean)))
+            .finally(() => setLoading(false));
+        }
+      } catch(e){}
+    }
+  }, []);
 
   // Load pokemon list
   useEffect(() => {
@@ -380,7 +558,11 @@ export function SquadBuilder() {
     setSearchQuery('');
     try {
       const pokemon = await fetchPokemon(id);
-      setSquad(prev => [...prev, pokemon]);
+      setSquad(prev => {
+        const next = [...prev, pokemon];
+        localStorage.setItem('pokefinder_squad', JSON.stringify(next.map(p => p.id)));
+        return next;
+      });
     } catch (e) {
       console.error('Failed to add pokemon:', e);
     }
@@ -388,7 +570,11 @@ export function SquadBuilder() {
   }, [squad]);
 
   const removeFromSquad = useCallback((id) => {
-    setSquad(prev => prev.filter(p => p.id !== id));
+    setSquad(prev => {
+      const next = prev.filter(p => p.id !== id);
+      localStorage.setItem('pokefinder_squad', JSON.stringify(next.map(p => p.id)));
+      return next;
+    });
   }, []);
 
   const analysis = useMemo(() => analyzeSquad(squad), [squad]);
@@ -527,65 +713,64 @@ export function SquadBuilder() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in mt-12 mb-10">
             
             {/* 1. Squad Rating Card */}
-            <div className="bg-[#2B61FA] rounded-[32px] p-8 flex flex-col items-center justify-center border-2 border-[#3F7CFF]/30 shadow-2xl relative overflow-hidden">
-              <div className="relative w-48 h-48 mb-8 mt-4">
+            <div className="bg-[#FACC15] rounded-[2.5rem] p-6 flex flex-col items-center justify-center shadow-2xl relative overflow-hidden border-t-4 border-t-[#0EA5E9] group hover:-translate-y-1 transition-all hover:shadow-[0_20px_40px_rgba(14,165,233,0.15)]">
+              <div className="relative w-36 h-36 mb-4 mt-2">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="12" />
+                  <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(30,58,95,0.08)" strokeWidth="10" />
                   <circle
                     cx="60" cy="60" r="46" fill="none"
                     stroke={getScoreColor(analysis.score)}
-                    strokeWidth="12"
+                    strokeWidth="10"
                     strokeLinecap="round"
                     strokeDasharray={`${(analysis.score / 100) * 289.026} 289.026`}
                     className="transition-all duration-1000 ease-out"
-                    style={{ filter: `drop-shadow(0 0 10px ${getScoreColor(analysis.score)}80)` }}
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[3.5rem] font-black leading-none tracking-tighter" style={{ color: getScoreColor(analysis.score) }}>
+                  <span className="text-3xl font-black leading-none tracking-tighter" style={{ color: getScoreColor(analysis.score) }}>
                     {analysis.score}
                   </span>
-                  <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mt-1">/ 100</span>
+                  <span className="text-[#1E3A5F]/30 text-[8px] font-black uppercase tracking-[0.2em] mt-1">/ 100</span>
                 </div>
               </div>
-              <h3 className="text-white text-xl font-black mb-2">Squad Rating</h3>
-              <p className="text-white/50 text-sm text-center">
+              <h3 className="text-[#1E3A5F] text-base font-black mb-1 uppercase tracking-tight">Squad Rating</h3>
+              <p className="text-[#1E3A5F]/50 text-[9px] font-bold uppercase tracking-[0.15em] text-center">
                 {analysis.score >= 80 ? 'Championship caliber team!' : analysis.score >= 60 ? 'Competitive ready with good balance.' : 'Decent team. Needs refinement.'}
               </p>
             </div>
 
             {/* 2. Team Stats Card */}
-            <div className="bg-[#2B61FA] rounded-[32px] p-8 border-2 border-[#3F7CFF]/30 shadow-2xl flex flex-col">
-              <h3 className="text-white font-black text-lg flex items-center gap-3 mb-8">
-                <Trophy size={20} className="text-[#FFD600]" />
+            <div className="bg-[#FACC15] rounded-[2.5rem] p-6 shadow-2xl flex flex-col border-t-4 border-t-emerald-500 group hover:-translate-y-1 transition-all hover:shadow-[0_20px_40px_rgba(16,185,129,0.15)]">
+              <h3 className="text-[#1E3A5F] font-black text-base uppercase tracking-tight flex items-center gap-2 mb-5">
+                <Trophy size={16} className="text-emerald-600" />
                 Team Stats
               </h3>
 
-              <div className="space-y-6 flex-1">
+              <div className="space-y-4 flex-1">
                 {[
-                  { label: 'Avg. BST', value: analysis.avgBST, max: 720, color: '#FFD600' },
-                  { label: 'Offensive Coverage', value: analysis.offensiveCoverage, max: 100, color: '#FF7A00', suffix: '%' },
-                  { label: 'Type Diversity', value: analysis.typeDiversity, max: 100, color: '#FFD600', suffix: '%' },
+                  { label: 'Avg. BST', value: analysis.avgBST, max: 720, color: '#22C55E' },
+                  { label: 'Offensive Coverage', value: analysis.offensiveCoverage, max: 100, color: '#3B82F6', suffix: '%' },
+                  { label: 'Type Diversity', value: analysis.typeDiversity, max: 100, color: '#F59E0B', suffix: '%' },
                 ].map((stat, i) => (
-                  <div key={i} className="space-y-2">
+                  <div key={i} className="space-y-1">
                     <div className="flex justify-between items-center">
-                      <span className="text-white/80 text-sm font-bold">{stat.label}</span>
-                      <span className="text-white font-black text-base">{stat.value}{stat.suffix || ''}</span>
+                      <span className="text-[#1E3A5F]/60 text-[9px] font-bold uppercase tracking-[0.2em]">{stat.label}</span>
+                      <span className="text-[#1E3A5F] font-black text-sm">{stat.value}{stat.suffix || ''}</span>
                     </div>
-                    <div className="h-1.5 bg-black/20 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-[#1E3A5F]/10 rounded-full overflow-hidden">
                       <div className="h-full rounded-full transition-all duration-700" style={{ width: `${(stat.value / stat.max) * 100}%`, backgroundColor: stat.color }} />
                     </div>
                   </div>
                 ))}
 
-                <div className="flex justify-between items-center py-2 border-y border-white/10 mt-6">
-                  <span className="text-white/80 text-sm font-bold">Squad</span>
-                  <span className="text-white font-black text-base">{squad.length}/6</span>
+                <div className="flex justify-between items-center py-2 border-y border-[#1E3A5F]/10 mt-3">
+                  <span className="text-[#1E3A5F]/60 text-[9px] font-bold uppercase tracking-[0.2em]">Squad</span>
+                  <span className="text-[#1E3A5F] font-black text-sm">{squad.length}/6</span>
                 </div>
 
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className="flex flex-wrap gap-1.5 pt-1">
                   {analysis.teamTypes.map(type => (
-                    <span key={type} className="px-4 py-1.5 rounded-full text-[9px] font-black text-white uppercase tracking-widest bg-[#FFD600] text-[#1E3A5F] border-none shadow-md">
+                    <span key={type} className="px-3 py-1 rounded-lg text-[8px] font-black text-white uppercase tracking-widest shadow-sm border border-black/10" style={{ backgroundColor: typeColors[type] || '#A8A878' }}>
                       {type}
                     </span>
                   ))}
@@ -594,26 +779,26 @@ export function SquadBuilder() {
             </div>
 
             {/* 3. Suggestions Card */}
-            <div className="bg-[#2B61FA] rounded-[32px] p-8 border-2 border-[#3F7CFF]/30 shadow-2xl flex flex-col h-full">
-              <h3 className="text-white font-black text-lg flex items-center gap-3 mb-6">
-                <Zap size={20} className="text-white" />
+            <div className="bg-[#FACC15] rounded-[2.5rem] p-6 shadow-2xl flex flex-col h-full border-t-4 border-t-red-500 group hover:-translate-y-1 transition-all hover:shadow-[0_20px_40px_rgba(239,68,68,0.15)]">
+              <h3 className="text-[#1E3A5F] font-black text-base uppercase tracking-tight flex items-center gap-2 mb-4">
+                <Zap size={16} className="text-red-600" />
                 Suggestions
               </h3>
               
-              <div className="space-y-4 overflow-y-auto flex-1 custom-scrollbar pr-2 h-full max-h-[300px]">
+              <div className="space-y-2.5 overflow-y-auto flex-1 custom-scrollbar pr-1 h-full max-h-[240px]">
                 {analysis.suggestions.length > 0 ? (
                   analysis.suggestions.map((s, i) => (
-                    <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-[#3B70FF] border border-white/10 shadow-sm transition-transform hover:scale-[1.02]">
-                      <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center flex-shrink-0">
+                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/40 border border-[#1E3A5F]/10 shadow-sm transition-transform hover:scale-[1.02]">
+                      <div className="w-8 h-8 rounded-full bg-[#1E3A5F]/10 text-[#1E3A5F] flex items-center justify-center flex-shrink-0">
                         <SuggestionIcon name={s.icon} />
                       </div>
-                      <p className="text-white/80 text-sm leading-relaxed font-medium">{s.text}</p>
+                      <p className="text-[#1E3A5F]/80 text-[10px] font-bold leading-relaxed">{s.text}</p>
                     </div>
                   ))
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full opacity-60">
-                    <Star className="text-[#FFD600] mb-4" size={40} />
-                    <p className="text-white font-bold text-center text-lg">Perfectly Balanced!</p>
+                    <Star className="text-[#1E3A5F]" size={32} />
+                    <p className="text-[#1E3A5F] font-black uppercase tracking-widest text-[10px] mt-3">Perfectly Balanced!</p>
                   </div>
                 )}
               </div>
