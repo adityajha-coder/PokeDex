@@ -30,9 +30,10 @@ A modern, high-performance PokéDex built with **Next.js**, featuring a nostalgi
 
 | Category | Description | Emoji |
 | :--- | :--- | :---: |
-| **Comprehensive DB** | Data from Generation 1 to 9, including stats and moves. | 🟢 |
+| **Comprehensive DB** | Data from Gen 1 to 9, including Abilities & Hidden Abilities. | 🟢 |
 | **Evolution Chains** | Detailed requirements for every evolution branch. | ⚪ |
 | **Type Matchups** | Instant calculations for offensive/defensive strategy. | 🔵 |
+| **Squad Builder** | Build teams, calculate Lvl 100 stats, and analyze competitive viability. | 🟡 |
 | **Smart Search** | Fuzzy search by name, ID, or elemental type. | 🟠 |
 | **Premium UI** | Glassmorphic, responsive, and buttery-smooth design. | 🔴 |
 
@@ -106,5 +107,5 @@ This project is open-source and available under the **MIT License**.
 </p>
 
 <p align="center">
-  <b>Built with ❤️ for Trainers everywhere.</b>
+  <b>Built for Trainers everywhere.</b>
 </p>

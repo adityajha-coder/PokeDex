@@ -1,7 +1,9 @@
-const CACHE_NAME = 'pokedex-pwa-v1';
+const CACHE_NAME = 'pokedex-pwa-v2';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
+  '/type-matchup',
+  '/squad',
 ];
 
 // Install service worker and cache static assets

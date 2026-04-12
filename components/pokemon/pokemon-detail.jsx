@@ -191,6 +191,22 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                   <span className="opacity-70 mr-1">Weakness:</span>
                   <span className="font-bold">{getWeakness(primaryType)[0]}</span>
                 </span>
+                <div className="flex flex-wrap items-center gap-2 mt-1">
+                  <span className="text-[#1E3A5F]/50 text-xs font-semibold tracking-widest">ABILITIES</span>
+                  {activePokemon.abilities?.map(({ ability, is_hidden }) => (
+                    <span
+                      key={ability.name}
+                      className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                        is_hidden
+                          ? 'bg-purple-500/15 text-purple-700 border-purple-500/30'
+                          : 'bg-[#1E3A5F]/10 text-[#1E3A5F] border-[#1E3A5F]/20'
+                      }`}
+                    >
+                      {capitalize(ability.name)}
+                      {is_hidden && <span className="ml-1 text-[9px] opacity-70">(Hidden)</span>}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
 

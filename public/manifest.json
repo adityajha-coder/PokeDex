@@ -1,12 +1,14 @@
 {
-  "name": "POKEDEX DB",
-  "short_name": "POKEDEX",
-  "description": "The ultimate digital world encyclopedia for all Pokemon species, evolutions, and tactical analysis.",
+  "name": "PokéDex-DB — Trainer's Companion",
+  "short_name": "PokéDex",
+  "description": "The ultimate digital encyclopedia for 1025+ Pokémon. Features complete Pokédex, Type Matchup tool, Squad Builder with competitive analysis, abilities, evolution chains, and Level 100 stat calculations.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1E3A5F",
   "theme_color": "#FACC15",
   "orientation": "portrait",
+  "id": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/favicon.svg",
@@ -19,5 +21,20 @@
     "games",
     "utilities",
     "entertainment"
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Type Matchup",
+      "short_name": "Types",
+      "url": "/type-matchup",
+      "description": "Check type effectiveness for battle strategy"
+    },
+    {
+      "name": "My Squad",
+      "short_name": "Squad",
+      "url": "/squad",
+      "description": "Build and analyze your dream team"
+    }
   ]
 }
