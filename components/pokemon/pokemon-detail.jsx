@@ -2,7 +2,7 @@
 
 import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
-import { X, Zap, Shield, Swords, Heart, Activity, Footprints, ChevronRight } from 'lucide-react';
+import { X, Zap, Shield, Swords, Heart, Activity, Footprints, ChevronRight, ChevronLeft } from 'lucide-react';
 import {
   fetchPokemonSpecies,
   fetchEvolutionChain,
@@ -49,7 +49,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
 
         const parseChain = async (node) => {
           const pokemonData = await fetchPokemon(node.species.name);
-          evolutions.push({ id: pokemonData.id, name: node.species.name });
+          evolutions.push({ id: pokemonData.id, name: node.species.name, data: pokemonData });
 
           for (const evolution of node.evolves_to) {
             await parseChain(evolution);
@@ -166,7 +166,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
               <p className="text-[#1E3A5F]/50 text-xs font-semibold tracking-widest mb-2">ABOUT</p>
               <div className="flex flex-col items-start gap-2">
                 <span className="px-4 py-1.5 rounded-full bg-[#1E3A5F]/10 text-[#1E3A5F] text-sm font-medium border border-[#1E3A5F]/20 flex items-center gap-2">
-                  Type: 
+                  <span className="opacity-70">Type:</span> 
                   {activePokemon.types.map(({ type }) => (
                     <span
                       key={type.name}
@@ -178,15 +178,18 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                   ))}
                 </span>
                 <span className="px-4 py-1.5 rounded-full bg-[#1E3A5F]/10 text-[#1E3A5F] text-sm font-medium border border-[#1E3A5F]/20">
-                  Category: {category}
+                  <span className="opacity-70 mr-1">Category:</span>
+                  <span className="font-bold">{category}</span>
                 </span>
                 {evolutionChain.length > 1 && pokemon.id !== evolutionChain[evolutionChain.length - 1].id && (
                   <span className="px-4 py-1.5 rounded-full bg-[#1E3A5F]/10 text-[#1E3A5F] text-sm font-medium border border-[#1E3A5F]/20">
-                    Evolves to: {capitalize(evolutionChain[evolutionChain.findIndex(e => e.id === pokemon.id) + 1]?.name || '')}
+                    <span className="opacity-70 mr-1">Evolves to:</span>
+                    <span className="font-bold">{capitalize(evolutionChain[evolutionChain.findIndex(e => e.id === pokemon.id) + 1]?.name || '')}</span>
                   </span>
                 )}
                 <span className="px-4 py-1.5 rounded-full bg-[#1E3A5F]/10 text-[#1E3A5F] text-sm font-medium border border-[#1E3A5F]/20">
-                  Weakness: {getWeakness(primaryType)[0]}
+                  <span className="opacity-70 mr-1">Weakness:</span>
+                  <span className="font-bold">{getWeakness(primaryType)[0]}</span>
                 </span>
               </div>
             </div>
@@ -272,32 +275,57 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
             </div>
 
             {/* Stats */}
-            <div className="bg-[#1E3A5F]/5 backdrop-blur-sm rounded-3xl p-6 border border-[#1E3A5F]/10">
-              <div className="flex items-center justify-between mb-4">
+            {/* Stats */}
+            <div className="bg-[#FACC15] rounded-3xl p-6 shadow-md border border-white/20">
+              <div className="flex items-center justify-between mb-2">
                 <h3 className="text-[#1E3A5F] font-black uppercase text-xs tracking-widest">Combat Capabilities</h3>
-                <Activity size={16} className="text-[#1E3A5F]/30" />
+                <Activity size={18} className="text-[#1E3A5F]/40" />
               </div>
-              <div className="grid grid-cols-1 gap-3">
-                {activePokemon.stats.map(({ stat, base_stat }) => (
-                  <div key={stat.name} className="flex flex-col gap-1">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-[#1E3A5F]">
+              <div className="flex flex-col">
+                {activePokemon.stats.map(({ stat, base_stat }) => {
+                  const basePokemonStat = pokemon.stats.find(s => s.stat.name === stat.name)?.base_stat || base_stat;
+                  
+                  // Calculate Level 100 stat using the same formula as Squad Builder
+                  const iv = 31;
+                  const ev = 0;
+                  
+                  // Calc for current active form
+                  let calc = 0;
+                  if (stat.name === 'hp') {
+                    if (base_stat === 1) calc = 1;
+                    else calc = Math.floor(((2 * base_stat + iv + Math.floor(ev / 4)) * 100) / 100) + 100 + 10;
+                  } else {
+                    calc = Math.floor((Math.floor(((2 * base_stat + iv + Math.floor(ev / 4)) * 100) / 100) + 5) * 1.0);
+                  }
+
+                  // Calc for original base form to find diff
+                  let baseCalc = 0;
+                  if (stat.name === 'hp') {
+                    if (basePokemonStat === 1) baseCalc = 1;
+                    else baseCalc = Math.floor(((2 * basePokemonStat + iv + Math.floor(ev / 4)) * 100) / 100) + 100 + 10;
+                  } else {
+                    baseCalc = Math.floor((Math.floor(((2 * basePokemonStat + iv + Math.floor(ev / 4)) * 100) / 100) + 5) * 1.0);
+                  }
+                  
+                  const diff = calc - baseCalc;
+
+                  return (
+                    <div key={stat.name} className="flex items-center justify-between py-3 border-b border-[#1E3A5F]/10 last:border-0">
+                      <div className="flex items-center gap-3 text-[#1E3A5F]">
                         {statIcons[stat.name]}
-                        <span className="text-[10px] font-black uppercase tracking-wider">{statLabels[stat.name]}</span>
+                        <span className="text-xs font-black uppercase tracking-wider">{statLabels[stat.name]}</span>
                       </div>
-                      <span className="text-[#1E3A5F] font-black text-xs">{base_stat}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[#1E3A5F] font-black text-sm">{calc}</span>
+                        {diff !== 0 && (
+                          <span className={`text-[11px] font-black ${diff > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                            ({diff > 0 ? '+' : ''}{diff})
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-1 bg-[#1E3A5F]/10 rounded-full h-2.5 overflow-hidden border border-[#1E3A5F]/5">
-                      <div
-                        className="h-full rounded-full transition-all duration-700 ease-out"
-                        style={{
-                          width: `${Math.min(100, (base_stat / 160) * 100)}%`,
-                          backgroundColor: base_stat > 110 ? '#22c55e' : base_stat > 70 ? '#2563eb' : '#ef4444'
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -329,27 +357,62 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
               />
             </div>
 
-            {/* Evolution Chain Thumbnails */}
-            {evolutionChain.length > 0 && (
-              <div className="flex gap-3 mt-4">
-                {evolutionChain.slice(0, 3).map((evo) => (
-                  <div
-                    key={evo.id}
-                    className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${evo.id === pokemon.id
-                        ? 'border-[#1E3A5F] bg-white shadow-lg scale-110'
-                        : 'border-[#1E3A5F]/20 bg-white/50'
-                      }`}
+            {/* Evolution Navigation Carousel */}
+            {(() => {
+              if (evolutionChain.length <= 1) return null;
+              const currentIndex = evolutionChain.findIndex(e => e.id === activePokemon.id);
+              
+              if (currentIndex === -1) return null; // Hide if currently viewing a Mega/Gmax
+              
+              return (
+                <div className="flex items-center gap-6 mt-8">
+                  <button 
+                    onClick={() => setActivePokemon(evolutionChain[currentIndex - 1].data)}
+                    disabled={currentIndex === 0}
+                    className={`p-2 rounded-full transition-all flex items-center justify-center w-10 h-10 ${
+                      currentIndex === 0 
+                        ? 'opacity-30 cursor-not-allowed bg-[#1E3A5F]/10' 
+                        : 'bg-[#1E3A5F] hover:bg-[#1E3A5F]/80 shadow-lg hover:scale-105 cursor-pointer'
+                    }`}
                   >
-                    <Image
-                      src={getOfficialArtwork(evo.id)}
-                      alt={evo.name}
-                      fill
-                      className="object-contain p-1"
-                    />
+                    <ChevronLeft size={20} className={currentIndex === 0 ? 'text-[#1E3A5F]' : 'text-white'} />
+                  </button>
+                  
+                  <div className="flex gap-3 items-center">
+                    {evolutionChain.slice(0, 3).map((evo) => (
+                      <button
+                        key={evo.id}
+                        onClick={() => setActivePokemon(evo.data)}
+                        className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 transition-all hover:border-[#1E3A5F] ${
+                          evo.id === activePokemon.id
+                            ? 'border-[#1E3A5F] bg-white shadow-lg scale-110 z-10'
+                            : 'border-[#1E3A5F]/20 bg-white/50 hover:scale-105'
+                        }`}
+                      >
+                        <Image
+                          src={getOfficialArtwork(evo.id)}
+                          alt={evo.name}
+                          fill
+                          className="object-contain p-1"
+                        />
+                      </button>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+
+                  <button 
+                    onClick={() => setActivePokemon(evolutionChain[currentIndex + 1].data)}
+                    disabled={currentIndex === evolutionChain.length - 1}
+                    className={`p-2 rounded-full transition-all flex items-center justify-center w-10 h-10 ${
+                      currentIndex === evolutionChain.length - 1 
+                        ? 'opacity-30 cursor-not-allowed bg-[#1E3A5F]/10' 
+                        : 'bg-[#1E3A5F] hover:bg-[#1E3A5F]/80 shadow-lg hover:scale-105 cursor-pointer'
+                    }`}
+                  >
+                    <ChevronRight size={20} className={currentIndex === evolutionChain.length - 1 ? 'text-[#1E3A5F]' : 'text-white'} />
+                  </button>
+                </div>
+              );
+            })()}
 
             {/* Page Indicator */}
             <div className="flex items-center gap-2 mt-6 text-[#1E3A5F]/40 text-sm">

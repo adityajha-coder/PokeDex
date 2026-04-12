@@ -65,15 +65,15 @@ export const Pokedex = memo(function Pokedex() {
   // Generation ranges
   const generations = useMemo(() => [
     { gen: 0, name: 'All', start: 1, end: TOTAL_POKEMON },
-    { gen: 1, name: 'Gen 1', start: 1, end: 151 },
-    { gen: 2, name: 'Gen 2', start: 152, end: 251 },
-    { gen: 3, name: 'Gen 3', start: 252, end: 386 },
-    { gen: 4, name: 'Gen 4', start: 387, end: 493 },
-    { gen: 5, name: 'Gen 5', start: 494, end: 649 },
-    { gen: 6, name: 'Gen 6', start: 650, end: 721 },
-    { gen: 7, name: 'Gen 7', start: 722, end: 809 },
-    { gen: 8, name: 'Gen 8', start: 810, end: 905 },
-    { gen: 9, name: 'Gen 9', start: 906, end: 1025 },
+    { gen: 1, name: 'Gen 1 (Kanto)', start: 1, end: 151 },
+    { gen: 2, name: 'Gen 2 (Johto)', start: 152, end: 251 },
+    { gen: 3, name: 'Gen 3 (Hoenn)', start: 252, end: 386 },
+    { gen: 4, name: 'Gen 4 (Sinnoh)', start: 387, end: 493 },
+    { gen: 5, name: 'Gen 5 (Unova)', start: 494, end: 649 },
+    { gen: 6, name: 'Gen 6 (Kalos)', start: 650, end: 721 },
+    { gen: 7, name: 'Gen 7 (Alola)', start: 722, end: 809 },
+    { gen: 8, name: 'Gen 8 (Galar)', start: 810, end: 905 },
+    { gen: 9, name: 'Gen 9 (Paldea)', start: 906, end: 1025 },
   ], []);
 
   // Load all Pokemon basic info at once (just names and IDs - very fast)
@@ -370,12 +370,12 @@ export const Pokedex = memo(function Pokedex() {
           <div className="text-center py-24 relative">
             {/* Ambient Background Glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#FACC15]/5 rounded-full blur-[3rem] -z-10" />
-            
+
             <div className="relative w-28 h-28 mx-auto mb-8">
               {/* Magic glowing aura */}
               <div className="absolute inset-0 bg-[#FACC15]/30 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '2s' }}></div>
               <div className="absolute inset-2 bg-blue-500/20 rounded-full blur-xl animate-pulse" style={{ animationDuration: '1.5s', animationDelay: '0.5s' }}></div>
-              
+
               {/* Animated Pokeball SVG */}
               <div className="w-full h-full relative z-10" style={{ animation: 'spin 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite' }}>
                 <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-2xl">
@@ -398,7 +398,7 @@ export const Pokedex = memo(function Pokedex() {
                 </svg>
               </div>
             </div>
-            
+
             <h3 className="text-white text-xl md:text-2xl font-black mb-3 uppercase tracking-[0.2em] animate-pulse">
               Fetching Magic Pokemon
             </h3>
