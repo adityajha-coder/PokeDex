@@ -164,7 +164,19 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
             {/* Info Pills */}
             <div className="mb-4">
               <p className="text-[#1E3A5F]/50 text-xs font-semibold tracking-widest mb-2">ABOUT</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col items-start gap-2">
+                <span className="px-4 py-1.5 rounded-full bg-[#1E3A5F]/10 text-[#1E3A5F] text-sm font-medium border border-[#1E3A5F]/20 flex items-center gap-2">
+                  Type: 
+                  {activePokemon.types.map(({ type }) => (
+                    <span
+                      key={type.name}
+                      className="px-2 py-0.5 rounded-full text-xs font-bold text-white shadow-sm"
+                      style={{ backgroundColor: typeColors[type.name] }}
+                    >
+                      {capitalize(type.name)}
+                    </span>
+                  ))}
+                </span>
                 <span className="px-4 py-1.5 rounded-full bg-[#1E3A5F]/10 text-[#1E3A5F] text-sm font-medium border border-[#1E3A5F]/20">
                   Category: {category}
                 </span>
@@ -348,18 +360,6 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
           </div>
         </div>
 
-        {/* Types Bar */}
-        <div className="flex justify-center gap-3 pb-6">
-          {activePokemon.types.map(({ type }) => (
-            <span
-              key={type.name}
-              className="px-5 py-2 rounded-full text-sm font-bold text-white shadow-lg"
-              style={{ backgroundColor: typeColors[type.name] }}
-            >
-              {capitalize(type.name)}
-            </span>
-          ))}
-        </div>
       </div>
     </div>
   );
