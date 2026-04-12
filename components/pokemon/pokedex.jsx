@@ -367,16 +367,44 @@ export const Pokedex = memo(function Pokedex() {
         {loading ? (
           <GridSkeleton count={12} />
         ) : filteredList.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto mb-4 opacity-40">
-              <svg viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" fill="none" stroke="white" strokeWidth="2" />
-                <line x1="32" y1="32" x2="68" y2="68" stroke="white" strokeWidth="2" />
-                <line x1="68" y1="32" x2="32" y2="68" stroke="white" strokeWidth="2" />
-              </svg>
+          <div className="text-center py-24 relative">
+            {/* Ambient Background Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#FACC15]/5 rounded-full blur-[3rem] -z-10" />
+            
+            <div className="relative w-28 h-28 mx-auto mb-8">
+              {/* Magic glowing aura */}
+              <div className="absolute inset-0 bg-[#FACC15]/30 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '2s' }}></div>
+              <div className="absolute inset-2 bg-blue-500/20 rounded-full blur-xl animate-pulse" style={{ animationDuration: '1.5s', animationDelay: '0.5s' }}></div>
+              
+              {/* Animated Pokeball SVG */}
+              <div className="w-full h-full relative z-10" style={{ animation: 'spin 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite' }}>
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-2xl">
+                  {/* Top Red Half */}
+                  <path d="M50 5 A 45 45 0 0 1 95 50 L 68 50 A 18 18 0 0 0 32 50 L 5 50 A 45 45 0 0 1 50 5 Z" fill="#EF4444" />
+                  {/* Bottom White Half */}
+                  <path d="M50 95 A 45 45 0 0 0 95 50 L 68 50 A 18 18 0 0 1 32 50 L 5 50 A 45 45 0 0 0 50 95 Z" fill="#F8FAFC" />
+                  {/* Center Rings */}
+                  <circle cx="50" cy="50" r="18" fill="white" stroke="#1E3A5F" strokeWidth="5" />
+                  <circle cx="50" cy="50" r="8" fill="#F8FAFC" stroke="#1E3A5F" strokeWidth="3" />
+                  {/* Glowing center button */}
+                  <circle cx="50" cy="50" r="4" fill="#60A5FA" className="animate-pulse" style={{ animationDuration: '1s' }} />
+                  {/* Divider Line */}
+                  <line x1="4" y1="50" x2="32" y2="50" stroke="#1E3A5F" strokeWidth="6" strokeLinecap="round" />
+                  <line x1="68" y1="50" x2="96" y2="50" stroke="#1E3A5F" strokeWidth="6" strokeLinecap="round" />
+                  {/* Outer Stroke */}
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="#1E3A5F" strokeWidth="6" />
+                  {/* Shading/Highlight */}
+                  <path d="M 18 28 Q 30 12 50 10 A 40 40 0 0 0 18 28" fill="rgba(255,255,255,0.3)" />
+                </svg>
+              </div>
             </div>
-            <h3 className="text-white text-lg font-bold mb-1">No Pokemon Found</h3>
-            <p className="text-white/50 text-sm">Try a different search or filter</p>
+            
+            <h3 className="text-white text-xl md:text-2xl font-black mb-3 uppercase tracking-[0.2em] animate-pulse">
+              Fetching Magic Pokemon
+            </h3>
+            <p className="text-white/40 text-xs font-black tracking-[0.3em] uppercase">
+              {loadingMore ? 'Synchronizing with region...' : 'Scanning the wilderness...'}
+            </p>
           </div>
         ) : (
           <div className="space-y-10">
