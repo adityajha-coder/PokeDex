@@ -362,6 +362,7 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
 
             {/* Evolution Navigation Carousel */}
             {(() => {
+<<<<<<< HEAD
                if (evolutionChain.length <= 1) return null;
                const currentIndex = evolutionChain.findIndex(e => e.id === activePokemon.id);
                
@@ -377,6 +378,23 @@ export const PokemonDetail = memo(function PokemonDetail({ pokemon, onClose }) {
                          ? 'opacity-30 cursor-not-allowed bg-[#1E3A5F]/10' 
                          : 'bg-[#1E3A5F] hover:bg-[#1E3A5F]/80 shadow-lg hover:scale-105 cursor-pointer'
                      }`}
+=======
+              if (evolutionChain.length <= 1) return null;
+              const currentIndex = evolutionChain.findIndex(e => e.id === activePokemon.id);
+              
+              if (currentIndex === -1) return null; // Hide if currently viewing a Mega/Gmax
+              
+              return (
+                <div className="flex items-center gap-6 mt-8">
+                  <button 
+                    onClick={() => setActivePokemon(evolutionChain[currentIndex - 1].data)}
+                    disabled={currentIndex === 0}
+                    className={`p-2 rounded-full transition-all flex items-center justify-center w-10 h-10 ${
+                      currentIndex === 0 
+                        ? 'opacity-30 cursor-not-allowed bg-[#1E3A5F]/10' 
+                        : 'bg-[#1E3A5F] hover:bg-[#1E3A5F]/80 shadow-lg hover:scale-105 cursor-pointer'
+                    }`}
+>>>>>>> master
                   >
                     <ChevronLeft size={20} className={currentIndex === 0 ? 'text-[#1E3A5F]' : 'text-white'} />
                   </button>
