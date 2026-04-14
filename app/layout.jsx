@@ -25,21 +25,20 @@ export const viewport = {
 }
 
 export const metadata = {
-  title: 'POKEDEX DB | Complete Pokemon Database',
-  description: 'POKEDEX DB - Your ultimate Pokemon database with all generations, type matchup calculator, and evolution tracker. Gotta catch em all!',
-  generator: 'v0.app',
+  title: 'POKEDEX | Complete Pokemon Database',
+  description: 'POKEDEX - Your ultimate Pokemon database with all generations, type matchup calculator, and evolution tracker. Gotta catch em all!',
   manifest: '/manifest.json',
   keywords: ['pokemon', 'pokedex', 'pwa', 'type matchup', 'evolution', 'pokemon database'],
   authors: [{ name: 'PokeDex' }],
   openGraph: {
-    title: 'POKEDEX DB',
+    title: 'POKEDEX',
     description: 'Complete Pokemon database with all generations',
     type: 'website',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'POKEDEX DB',
+    title: 'POKEDEX',
   },
   icons: {
     icon: '/favicon.svg',

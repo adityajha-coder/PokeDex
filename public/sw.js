@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pokedex-pwa-v2';
+const CACHE_NAME = 'pokedex-pwa';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
