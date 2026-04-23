@@ -72,10 +72,7 @@ npm install
 ```
 
 ### 3. Environment Variables
-You'll need to set up a quick environment file. Just copy the example provided:
-```bash
-cp .env.example .env.local
-```
+You'll need to set up a env file.
 
 ### 4. Fire it up!
 Start the development server:
