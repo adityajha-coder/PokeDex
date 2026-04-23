@@ -108,7 +108,6 @@ For the curious developers diving into the codebase:
 
 Feel free to fork this project, submit PRs, or open issues if you find any bugs or have feature requests. I'm always open to making this tool better!
 
-This project is open-source and available under the **MIT License**.
 
 ---
 
