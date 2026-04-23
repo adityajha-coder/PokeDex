@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" width="120" alt="Pikachu" />
 </p>
 
-# <p align="center">PokéDex-DB 🔴⚪</p>
+# <p align="center">PokéDex 🔴⚪</p>
 
 <p align="center">
   <i>Your ultimate digital companion for exploring Pokémon species, analyzing competitive squads, and mastering evolution chains.</i>
@@ -18,7 +18,7 @@
 
 ---
 
-## 📸 What is PokéDex-DB?
+##  What is PokéDex-DB?
 
 Hey fellow Trainers! 👋 Welcome to PokéDex-DB. I built this project because I wanted a smooth, modern, and genuinely useful PokéDex that goes beyond just listing basic stats. 
 
@@ -29,7 +29,7 @@ Built with **Next.js 16** and **React 19**, it's designed to feel less like a st
 
 ---
 
-## ✨ Features That Pack a Punch
+##  Features That Pack a Punch
 
 Here's what you can do with PokéDex-DB:
 
@@ -39,12 +39,12 @@ Here's what you can do with PokéDex-DB:
 | 🧬 **Evolution Tracking** | No more guessing how to evolve an Eevee. Get clear visual pathways and exact requirements (levels, items, friendship, day/night) for every single evolution branch. |
 | ⚔️ **Squad Analyzer** | The real game-changer. Build your dream team of 6, calculate their actual Level 100 stats, and get instant competitive feedback and synergy scoring. |
 | 🎯 **Type Matchup Calculator** | Instantly analyze offensive and defensive advantages so you never bring a Grass type to a Fire fight. |
-| 📱 **PWA Functionality** | Install PokéDex-DB right to your phone's home screen. It feels just like a native app! |
-| 🎨 **Premium UI/UX** | A crafted, clean, non-glowing yellow-themed aesthetic with a compact glassmorphic dashboard that simply feels *good* to use. |
+| 📱 **PWA Functionality** | Install PokéDex right to your phone's home screen. It feels just like a native app! |
+| 🎨 **Premium UI/UX** | A crafted, clean, non-glowing yellow themed aesthetic with a compact glassmorphic dashboard that simply feels *good* to use. |
 
 ---
 
-## 🛠️ The Tech Under the Hood
+##  The Tech Under the Hood
 
 I've used a modern stack to make sure this application is as fast and robust as possible:
 
@@ -56,7 +56,7 @@ I've used a modern stack to make sure this application is as fast and robust as 
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 Want to run PokéDex-DB locally? It's super easy.
 
@@ -86,7 +86,7 @@ Then, open [http://localhost:3000](http://localhost:3000) in your browser, and y
 
 ---
 
-## 📁 Project Structure 
+##  Project Structure 
 
 For the curious developers diving into the codebase:
 
